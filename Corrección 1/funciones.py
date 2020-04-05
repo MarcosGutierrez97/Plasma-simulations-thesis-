@@ -18,10 +18,9 @@ puntos_malla = [i for i in range(pa.NoPpC)]
 """
 #TODO ESTO LO ESTOY HACIENDO SOLO PARA PLASMA FRIO, PERO LOS DEMAS CASOS SOLO SERIA DE AGREGAR DISTRIBUCIONES
 
-def buildgrid(): 
+def buildgrid_pos(): 
     #posiciones:
     x_0 = []
-    v_0 = []
     x_i = pa.malla_final-pa.plasma_inicio #Longitud de donde va a cargar la malla
     espacio_particulas = x_i/pa.noParticulas
     carga = -pa.rho*espacio_particulas
@@ -30,18 +29,33 @@ def buildgrid():
     for i in range(pa.noParticulas):
         x_0[i] = pa.plasma_inicio + espacio_particulas*(i+0.5)
         x_0[i] += pa.x0*np.cos(x_0[i])
-    #velocidades 
+    return x_0
+
+
+ def buildgrid_vel():
+     #velocidades 
     #plasma frio
     v_0[1:pa.noParticulas] = 0
-    
+    return v_0
+     
         
     
     
 
-def electricfield():
+def electricfield(): #Le di por trapecio porque un chingo lo hacian asi.
+    rho_neto = pa.rho + pa.rhoE
+    rho_N =[rho_neto]
+    Ex = []
+    Ex[pa.noMalla] = 0
+    E_i = 0
+    for i in range(pa.noMalla-1,-1,-1):
+        Ex[i] = Ex[i+1] - 0.5*(rho_N[i] + rho_N[i+1])*pa.dx
+        E_i = E_i + Ex[i]
     
-    
-    pass    # si no tenes definida una funcion, lo usual es poner pass
+    #Condiciones de frontera
+    Ex[0:pa.noMalla] -= E_i/pa.noMalla
+    Ex[pa.noMalla] = Ex[0]
+    return Ex
 
 
 def chargevelocity(E):
