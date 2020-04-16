@@ -16,34 +16,31 @@ import numpy as np
 puntos_malla = [i for i in range(pa.NoPpC)]
 
 """
-#TODO ESTO LO ESTOY HACIENDO SOLO PARA PLASMA FRIO, PERO LOS DEMAS CASOS SOLO SERIA DE AGREGAR DISTRIBUCIONES
+# TODO ESTO LO ESTOY HACIENDO SOLO PARA PLASMA FRIO, PERO LOS DEMAS CASOS SOLO SERIA DE AGREGAR DISTRIBUCIONES
 
 def buildgrid_pos(): 
     #posiciones:
     x_0 = []
-    x_i = pa.malla_final-pa.plasma_inicio #Longitud de donde va a cargar la malla
+    x_i = pa.plasma_final-pa.plasma_inicio #Longitud de donde va a cargar la malla
     espacio_particulas = x_i/pa.noParticulas
     carga = -pa.rho*espacio_particulas
-    masa = carga/pa.carga_masa
+    masa = carga/pa.carga_masa # ? NO SE USA
     
     for i in range(pa.noParticulas):
         x_0[i] = pa.plasma_inicio + espacio_particulas*(i+0.5)
         x_0[i] += pa.x0*np.cos(x_0[i])
     return x_0
 
-
- def buildgrid_vel():
-     #velocidades 
+###### Para que se necesita esta funcion?
+def buildgrid_vel():
+    #velocidades
     #plasma frio
-    v_0[1:pa.noParticulas] = 0
+    v_0[1:pa.noParticulas] = 0 # ??? Hay que definir antes a v_0
     return v_0
      
-        
-    
-    
 
-def electricfield(): #Le di por trapecio porque un chingo lo hacian asi.
-    rho_neto = pa.rho + pa.rhoE
+def electricfield(): #Le di por trapecio porque un chingo lo hacian asi. ✓ virgo
+    rho_neto = pa.rho + pa.rhoE # ??? Que es rhoE?
     rho_N =[rho_neto]
     Ex = []
     Ex[pa.noMalla] = 0
@@ -58,7 +55,7 @@ def electricfield(): #Le di por trapecio porque un chingo lo hacian asi.
     return Ex
 
 
-def chargevelocity(E):
+def chargevelocity():
     '''
     Implementando Ecuacion 8 de Martin.pdf 
     '''
@@ -73,7 +70,7 @@ def chargevelocity(E):
 
 
 
-def chargeposition(v_med):
+def chargeposition():
     '''
     Implementando Ecuacion 9 de Martin.pdf 
     '''
@@ -84,10 +81,12 @@ def chargeposition(v_med):
         x.append(pos)
 
     return x
-def cf(x_cf):
+
+
+def cf(x_cf): ### ? Nunca usas x_cf, y no se por que regresar True
     x = chargeposition()
     for i in range(pa.noParticulas):
-        if x[i] < pa.malla_inicio:
+        if x[i] < pa.malla_inicio: ### Faltan malla_inicio y malla_final en parametros.py
             x[i] += pa.malla_final
         elif x[i] > pa.malla_final:
             x[i] -= pa.malla_final
@@ -95,7 +94,7 @@ def cf(x_cf):
             
             
 
-def chargedensity(carga_e, x):
+def chargedensity():
     '''
     Implementando Ecuaciones 20 y 21 de Martin.pdf
     Solo si X[0] = 0 (revisa que esto suceda) YA SUCEDE
