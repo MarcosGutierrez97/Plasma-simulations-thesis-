@@ -23,75 +23,75 @@ puntos_malla = [i for i in range(pa.NoPpC)]
 
 def buildgrid_pos():
     #posiciones:
-    x_0 = []
-    x_i = pa.plasma_final-pa.plasma_inicio #Longitud de donde va a cargar la malla
-    espacio_particulas = x_i/pa.noParticulas
-    carga = -pa.rho*espacio_particulas
-    masa = carga/pa.carga_masa # ? NO SE USA
+    x_0 = np.array([])
+    x_i = pa.plasma_final - pa.plasma_inicio #Longitud de donde va a cargar la malla
+    espacio_particulas = x_i / pa.noParticulas
+    carga = -pa.rho * espacio_particulas
+    masa = carga/pa.carga_masa ### no se usa
 
     for i in range(pa.noParticulas):
-        x_0.append(pa.plasma_inicio + espacio_particulas*(i+0.5))
-        x_0[i] += pa.x0*np.cos(x_0[i])
+        x_0 = np.append(x_0, pa.plasma_inicio + espacio_particulas * (i + 0.5))
+        x_0[i] += pa.x0 * np.cos(x_0[i])
     return x_0
 
-###### Para que se necesita esta funcion?
+
 def buildgrid_vel():
     #velocidades
     #plasma frio
-    v_0 = []
+    v_0 = np.array([])
     for i in range(pa.noParticulas):
-        v_0.append(0) # ??? Hay que definir antes a v_0
+        v_0 = np.append(v_0, 0)
     return v_0
 
 
 def electricfield(rho0): #Le di por trapecio porque un chingo lo hacian asi. ✓ virgo
-    rho_neto = pa.densidadI + rho0 #Corregido
-    rho_N =[rho_neto]
+    rho_neto = pa.densidadI + rho0 
+    rho_N = np.array([rho_neto]) #### No se usa
     integrante = pa.dx * sp.arange(pa.noMalla + 1)
-    Ex = integrate.cumtrapz(rho_neto,integrante,initial = integrante[0])
+    Ex = integrate.cumtrapz(rho_neto, integrante, initial=integrante[0])
     E_i = sp.sum(Ex)
 
-#Condiciones de frontera
-    Ex[0:pa.noMalla] = E_i/pa.noMalla
+    #Condiciones de frontera
+    Ex[0:pa.noMalla] = E_i / pa.noMalla
     Ex[pa.noMalla] = Ex[0]
     return Ex
 
 
-def chargevelocity(x0,E0):
+def chargevelocity(pos, E0):
     '''
     Implementando Ecuacion 8 de Martin.pdf
 
     '''
     #Extrapolación del campo eléctrico (no lo había puesto)
-    pos = x0
-    E = E0
-    E_particula = []
-    for i in range(pa.noParticulas):
-        Ep = (1-(pos[i]/pa.dx-i))*E[i] +  (pos[i]/pa.dx-i)*E[i+1]
-        E_particula.append(Ep)
-
-
-
-    v = [-pa.dt/2] #Condición necesaria para el método de integración Leap-Frog
+    # print(E0.shape)  # (101,) 
+    # print(pos.shape) # (10000,)
+    v = np.array([-pa.dt/2]) #Condición necesaria para el método de integración Leap-Frog
 
     for i in range(pa.noParticulas):
-        vel = v[i] + pa.carga_masa * E_particula[i] * pa.dt
-        v.append(vel)
+       #  Tipo esto podes usar para probar
+        try:
+            Ep = (1-(pos[i]/pa.dx-i))*E0[i] +  (pos[i]/pa.dx-i)*E0[i+1]
+            vel = v[i] + pa.carga_masa * Ep * pa.dt
+            v = np.append(v, vel)
+        except IndexError:
+            print(f"Partice: {i}, Position: {pos[i]}, Electric Field: {E0[i]}") # esto sirve con Python>=3.6, si usas otro Python, usa la siguiente linea
+            # print("Particle: {}, Position: {}, Electric Field: {}".format(i, pos[i], E0[i]))
+            break
 
     return v
 
 
 
 
-def chargeposition(v0):
+def chargeposition(v_med):
     '''
     Implementando Ecuacion 9 de Martin.pdf
     '''
-    x = [0] #Condición necesaria para el método de integración Leap-Frog
-    v_med = v0
+    x = np.array([0.0]) #Condición necesaria para el método de integración Leap-Frog
+    # v_med = v0
     for i in range(pa.noParticulas):
         pos = x[i] +  v_med[i] * pa.dt
-        x.append(pos)
+        x = np.append(x, pos)
 
     return x
 
@@ -114,10 +114,10 @@ def chargedensity(x0):
     '''
     x = x0
     q_e = pa.carga_e / pa.dx
-    charge_density = [q_e]
+    charge_density = np.array([q_e])
 
     for i in range(pa.noMalla):
         rho_i_1 = q_e * (x[i] / pa.dx - i) / pa.dx
-        charge_density.append(rho_i_1)
+        charge_density = np.append(charge_density, rho_i_1)
 
     return charge_density
