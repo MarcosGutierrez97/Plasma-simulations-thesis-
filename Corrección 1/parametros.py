@@ -20,7 +20,7 @@ velocidades = np.zeros(noParticulas)
 
 #Arrays de la malla
 
-densidadE = np.zeros(noMalla + 1) #Densidad de electrones 
+densidadE = np.zeros(noMalla + 1) #Densidad de electrones
 densidadI = np.zeros(noMalla + 1) #Densidad de iones (el fondo de la malla)
 
 CampoEx = np.zeros(noMalla + 1)     #Campo electrico
@@ -35,6 +35,6 @@ dx = malla_longitud/noMalla
 dt = 0.05
 carga_masa = -1 #relacion carga masa
 rho = 1 #Densidad del fondo de iones (default)
-velocidad_termica = 0.02 
+velocidad_termica = 0.02
 x0 = 0.01 #perturbacion de amplitud
 v0 = 0.0 #perturbacion de velocidad
