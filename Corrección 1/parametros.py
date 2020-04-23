@@ -9,7 +9,7 @@ import numpy as np
 #Parametros del experimentos (tomados de Brisdall et tal)
 
 noParticulas = 10000 #Numero de particulas
-noMalla = 100 #puntos de la malla
+noMalla = 1000 #puntos de la malla
 carga_e = -1 #electron
 carga_i = 1 #ion
 

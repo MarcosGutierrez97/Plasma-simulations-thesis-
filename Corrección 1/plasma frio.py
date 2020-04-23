@@ -25,4 +25,4 @@ temp = pa.dt
 
     #Mover particulas
 posicion = f.chargeposition(v_inicial)
-velocidad = f.chargevelocity(x_inicial, E_inicial)
+velocidad = f.chargevelocity(x_inicial,v_inicial, E_inicial)
