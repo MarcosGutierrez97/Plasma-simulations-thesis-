@@ -17,13 +17,12 @@ v_inicial = f.buildgrid_vel()
 densidad_inicial = f.chargedensity(x_inicial)
 E_inicial = f.electricfield(densidad_inicial)
 
-
 #Se empieza a constuir el ciclo
 
 temp = pa.dt
 
-while temp < 0.5:
+# while temp < 0.5:  # proba esto despues, primero que te corra una vez
 
     #Mover particulas
-    posicion = f.chargeposition(v_inicial)
-    velocidad = f.chargevelocity(x_inicial,E_inicial)
+posicion = f.chargeposition(v_inicial)
+velocidad = f.chargevelocity(x_inicial, E_inicial)
