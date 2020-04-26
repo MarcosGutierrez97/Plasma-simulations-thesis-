@@ -27,7 +27,7 @@ CampoEx = np.zeros(noMalla + 1)     #Campo electrico
 potencialM = np.zeros(noMalla + 1)   #Potencial Magnetico
 
 #Variables principales
-
+coor_malla = [i*2*np.pi for i in range(noMalla)]
 malla_longitud = 2*np.pi #Tamano de la malla espacial
 plasma_inicio = 0
 plasma_final = malla_longitud

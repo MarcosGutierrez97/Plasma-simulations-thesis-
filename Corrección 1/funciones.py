@@ -21,6 +21,11 @@ puntos_malla = [i for i in range(pa.NoPpC)]
 """
 # TODO ESTO LO ESTOY HACIENDO SOLO PARA PLASMA FRIO, PERO LOS DEMAS CASOS SOLO SERIA DE AGREGAR DISTRIBUCIONES
 
+#Necesaria para rho y E
+def closed_range(start, stop, step=1):
+  dir = 1 if (step > 0) else -1
+  return range(start, stop + dir, step)
+
 def buildgrid_pos():
     #posiciones:
     x_0 = np.array([])
@@ -45,7 +50,7 @@ def buildgrid_vel():
 
 
 def electricfield(rho0): #Le di por trapecio porque un chingo lo hacian asi. ✓ virgo
-    rho_neto = 1 + rho0
+    rho_neto = pa.densidadI + rho0
     integrante = pa.dx * sp.arange(pa.noMalla + 1)
     Ex = integrate.cumtrapz(rho_neto, integrante, initial=integrante[0])
     E_i = sp.sum(Ex)
@@ -66,16 +71,18 @@ def chargevelocity(x0,v0,E0):
     pos = x0
     E = E0
     E_particula = []
-    for i in range(pa.noParticulas):
-        x_dx = pos[i]/pa.dx
-        j1 = int(x_dx)
-        j2 = j1 + 1
-        b2 = x_dx - j1
-        b1 = 1.0 - b2
-        Ex = b1*E[j1] + b2*E[j2]
-        E_particula.append(Ex)
-        v[i] = v[i] + pa.carga_masa * Ex * pa.dt
-        
+    C1 = [] #pa.coor_malla[j+1] - x[i]
+    C2 = [] #x[i]-pa.coor_malla[j]
+    i = 0 #contador noParticulas
+    j = 0 #Contador campo electrico
+    q = 0 #segundo contador de noParticulas
+    p = 0 #segundo contador de malla
+    while i <= pa.noParticulas-1:
+        if x[i] >= pa.coor_malla[j] and x[i] >= pa.coor_malla[j+1]:
+            E_particula.append((x[i]-pa.coor_malla[j])*E[j] + (pa.coor_malla[j+1]-x[i])*E[j+1])
+            i= i + 1
+        else:
+            j = j + 1
 
     return v
 
@@ -112,21 +119,34 @@ def chargedensity(x0):
     Solo si X[0] = 0 (revisa que esto suceda) YA SUCEDE
     '''
     x = x0
-    q_e = pa.carga_e / pa.dx
-    charge_density = np.zeros(pa.noMalla + 1)
-    for i in range(pa.noParticulas):
-        x_dx = x[i]/pa.dx
-        j1 = int(x_dx)
-        j2 = j1 + 1
-        b2 = x_dx - j1
-        b1 = 1.0 - b2
-        charge_density[j1] = charge_density[j1] + q_e * b1
-        charge_density[j2] = charge_density[j2] + q_e * b2
-        
-        #Condiciones de frontera
-        charge_density[0] += charge_density[pa.noMalla]
-        charge_density[0] = charge_density[pa.noMalla]
-        
+    charge_density = [0.0 for g in range(pa.noMalla)]
 
-    
+    i = 0 #Contador para particulas en x_i
+    k = 1 #Contador para particulas en x_i+1 = i+1
+    j = 0#Contador para malla
+    while j < (pa.noMalla):
+        while i < (pa.noParticulas):
+            if x[i] >= pa.coor_malla[j] and x[i] <= pa.coor_malla[j+1]:
+                c1 = (pa.carga_e*(pa.coor_malla[j+1] - x[i])) #rho_i
+                c2 = (pa.carga_e*(x[i] - pa.coor_malla[j])) #rho_i+1
+                if charge_density[i]  != 0.0:
+                    charge_density[i] = charge_density[i] + c1
+                    charge_density[i+1] = c2
+                else:
+                    charge_density[i] = c1
+                    charge_density[i+1] = c2
+
+
+
+
+
+
+                i = i + 1
+                k = k + 1
+            else:
+                j = j+1
+    i = 0
+    k = 1
+    j = 0
+
     return charge_density

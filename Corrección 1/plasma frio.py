@@ -15,7 +15,10 @@ import numpy as np
 x_inicial = f.buildgrid_pos()
 v_inicial = f.buildgrid_vel()
 densidad_inicial = f.chargedensity(x_inicial)
+
 E_inicial = f.electricfield(densidad_inicial)
+
+
 
 #Se empieza a constuir el ciclo
 
