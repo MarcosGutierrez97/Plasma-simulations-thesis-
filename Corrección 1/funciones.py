@@ -67,7 +67,7 @@ def chargevelocity(x,v,E):
 
     '''
     #Extrapolación del campo eléctrico (no lo había puesto)
-    E_particula = []
+    E_particula = [0 for a in range (pa.noParticulas)]
     i = 0 #Contador para C_i
     j = 1#Contador para C_i+1
     #Acorde a la presentacion de plasma del CERN
@@ -77,7 +77,8 @@ def chargevelocity(x,v,E):
         if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[j]:
             c1 = (pa.carga_e*(pa.coor_malla[j] - x[k])) #rho_i
             c2 = (pa.carga_e*(x[k] - pa.coor_malla[i])) #rho_i+1
-            E_particula.append (E[i]*c2 + E[j] * c1)
+            E_particula[k] = E_particula[k] + (E[i]*c2 + E[j] * c1)
+            v[k] = v[k] - E_particula[k]*pa.dt  #pa.carga_e*E_particula[vel]*pa.dt
             k = k + 1
         else:
             k = k + 1
@@ -87,7 +88,7 @@ def chargevelocity(x,v,E):
     #while vel < (pa.noParticulas):
         #v[vel] = v[vel] + pa.carga_e*E_particula[vel]*pa.dt
 
-    return E_particula
+    return v
 
 
 
@@ -114,7 +115,7 @@ def cf(x_cf): ### ? Nunca usas x_cf, y no se por que regresar True R/: Las uso d
             x[i] += pa.plasma_final
         elif x[i] > pa.plasma_final:
             x[i] -= pa.plasma_final
-    return True
+    return x
 
 
 

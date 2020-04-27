@@ -13,12 +13,11 @@ import numpy as np
 #Ciclo inicial. Este solo se hace una vez
 
 
-x_inicial = f.buildgrid_pos()
-v_inicial = f.buildgrid_vel()
+x_inicial = f.buildgrid_pos() #Solo se hace una vez
+v_inicial = f.buildgrid_vel() #Solo se hace una vez
 densidad_inicial = f.chargedensity(x_inicial,pa.densidadE)
 E_inicial = f.electricfield(densidad_inicial)
-print (f.chargevelocity(x_inicial,v_inicial, E_inicial))
-print (len(f.chargevelocity(x_inicial,v_inicial, E_inicial)))
+
 
 
 
@@ -28,6 +27,6 @@ temp = pa.dt
 
 # while temp < 0.5:  # proba esto despues, primero que te corra una vez
 
-    #Mover particulas
+    #Mover particulas t = 0
 posicion = f.chargeposition(v_inicial)
 velocidad = f.chargevelocity(x_inicial,v_inicial, E_inicial)
