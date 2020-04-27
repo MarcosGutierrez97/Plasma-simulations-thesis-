@@ -22,12 +22,14 @@ velocidades = np.zeros(noParticulas)
 
 densidadE = np.zeros(noMalla + 1) #Densidad de electrones
 densidadI = np.zeros(noMalla + 1) #Densidad de iones (el fondo de la malla)
-
+#print(densidadE)
 CampoEx = np.zeros(noMalla + 1)     #Campo electrico
 potencialM = np.zeros(noMalla + 1)   #Potencial Magnetico
 
 #Variables principales
-coor_malla = [i*2*np.pi for i in range(noMalla)]
+coor_malla = [i*2*np.pi for i in range(noMalla+1)]
+#print(coor_malla)
+#print (len(coor_malla))
 malla_longitud = 2*np.pi #Tamano de la malla espacial
 plasma_inicio = 0
 plasma_final = malla_longitud

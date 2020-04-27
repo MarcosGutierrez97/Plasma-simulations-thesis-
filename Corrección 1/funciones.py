@@ -61,30 +61,35 @@ def electricfield(rho0): #Le di por trapecio porque un chingo lo hacian asi. ✓
     return Ex
 
 
-def chargevelocity(x0,v0,E0):
+def chargevelocity(x,v,E):
     '''
     Implementando Ecuacion 8 de Martin.pdf
 
     '''
     #Extrapolación del campo eléctrico (no lo había puesto)
-    v = v0
-    pos = x0
-    E = E0
     E_particula = []
-    C1 = [] #pa.coor_malla[j+1] - x[i]
-    C2 = [] #x[i]-pa.coor_malla[j]
-    i = 0 #contador noParticulas
-    j = 0 #Contador campo electrico
-    q = 0 #segundo contador de noParticulas
-    p = 0 #segundo contador de malla
-    while i <= pa.noParticulas-1:
-        if x[i] >= pa.coor_malla[j] and x[i] >= pa.coor_malla[j+1]:
-            E_particula.append((x[i]-pa.coor_malla[j])*E[j] + (pa.coor_malla[j+1]-x[i])*E[j+1])
-            i= i + 1
+    i = 0 #Contador para C_i
+    j = 1#Contador para C_i+1
+    #Acorde a la presentacion de plasma del CERN
+    k = 0 #Contador de particulas
+    vel = 0
+    while k < (pa.noParticulas):
+        if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[j]:
+            c1 = (pa.carga_e*(pa.coor_malla[j] - x[k])) #rho_i
+            c2 = (pa.carga_e*(x[k] - pa.coor_malla[i])) #rho_i+1
+            E_particula.append (E[i]*c2 + E[j] * c1)
+            k = k + 1
         else:
-            j = j + 1
+            k = k + 1
+            i = i + 2
+            j = j + 2
 
-    return v
+    #while vel < (pa.noParticulas):
+        #v[vel] = v[vel] + pa.carga_e*E_particula[vel]*pa.dt
+
+    return E_particula
+
+
 
 
 
@@ -113,40 +118,29 @@ def cf(x_cf): ### ? Nunca usas x_cf, y no se por que regresar True R/: Las uso d
 
 
 
-def chargedensity(x0):
+def chargedensity(x,charge_density):
     '''
     Implementando Ecuaciones 20 y 21 de Martin.pdf
     Solo si X[0] = 0 (revisa que esto suceda) YA SUCEDE
     '''
-    x = x0
-    charge_density = [0.0 for g in range(pa.noMalla)]
 
-    i = 0 #Contador para particulas en x_i
-    k = 1 #Contador para particulas en x_i+1 = i+1
-    j = 0#Contador para malla
-    while j < (pa.noMalla):
-        while i < (pa.noParticulas):
-            if x[i] >= pa.coor_malla[j] and x[i] <= pa.coor_malla[j+1]:
-                c1 = (pa.carga_e*(pa.coor_malla[j+1] - x[i])) #rho_i
-                c2 = (pa.carga_e*(x[i] - pa.coor_malla[j])) #rho_i+1
-                if charge_density[i]  != 0.0:
-                    charge_density[i] = charge_density[i] + c1
-                    charge_density[i+1] = c2
-                else:
-                    charge_density[i] = c1
-                    charge_density[i+1] = c2
+    i = 0 #Contador para C_i
+    j = 1#Contador para C_i+1
+    malla = 0 #Contador de nodos
+    #Acorde a la presentacion de plasma del CERN
+    k = 0
 
 
-
-
-
-
-                i = i + 1
-                k = k + 1
-            else:
-                j = j+1
-    i = 0
-    k = 1
-    j = 0
+    while k < (pa.noParticulas):
+        if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[j]:
+            c1 = (pa.carga_e*(pa.coor_malla[j] - x[k])) #rho_i
+            charge_density[i] = charge_density[i] + c1
+            c2 = (pa.carga_e*(x[k] - pa.coor_malla[i])) #rho_i+1
+            charge_density[j] = charge_density[j] + c2
+            k = k + 1
+        else:
+            k = k + 1
+            i = i + 2
+            j = j + 2
 
     return charge_density

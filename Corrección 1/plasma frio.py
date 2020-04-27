@@ -12,11 +12,13 @@ import numpy as np
 
 #Ciclo inicial. Este solo se hace una vez
 
+
 x_inicial = f.buildgrid_pos()
 v_inicial = f.buildgrid_vel()
-densidad_inicial = f.chargedensity(x_inicial)
-
+densidad_inicial = f.chargedensity(x_inicial,pa.densidadE)
 E_inicial = f.electricfield(densidad_inicial)
+print (f.chargevelocity(x_inicial,v_inicial, E_inicial))
+print (len(f.chargevelocity(x_inicial,v_inicial, E_inicial)))
 
 
 
