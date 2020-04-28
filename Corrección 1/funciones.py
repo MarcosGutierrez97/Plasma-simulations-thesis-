@@ -26,26 +26,23 @@ def closed_range(start, stop, step=1):
   dir = 1 if (step > 0) else -1
   return range(start, stop + dir, step)
 
-def buildgrid_pos():
+def buildgrid_pos(x_0):
     #posiciones:
-    x_0 = np.array([])
     x_i = pa.plasma_final - pa.plasma_inicio #Longitud de donde va a cargar la malla
     espacio_particulas = x_i / pa.noParticulas
     carga = -pa.rho * espacio_particulas
     masa = carga/pa.carga_masa ### no se usa
 
     for i in range(pa.noParticulas):
-        x_0 = np.append(x_0, pa.plasma_inicio + espacio_particulas * (i + 0.5))
+        x_0[i] =  pa.plasma_inicio + espacio_particulas * (i + 0.5)
         x_0[i] += pa.x0 * np.cos(x_0[i])
     return x_0
 
 
-def buildgrid_vel():
+def buildgrid_vel(v_0):
     #velocidades
     #plasma frio
-    v_0 = np.array([])
-    for i in range(pa.noParticulas):
-        v_0 = np.append(v_0, 0)
+    v_0[1:pa.noParticulas] = 0
     return v_0
 
 
@@ -61,13 +58,14 @@ def electricfield(rho0): #Le di por trapecio porque un chingo lo hacian asi. ✓
     return Ex
 
 
-def chargevelocity(x,v,E):
+def chargevelocity(x,v,E_malla, E_anterior):
     '''
     Implementando Ecuacion 8 de Martin.pdf
 
     '''
     #Extrapolación del campo eléctrico (no lo había puesto)
-    E_particula = [0 for a in range (pa.noParticulas)]
+
+    E_particula = []
     i = 0 #Contador para C_i
     j = 1#Contador para C_i+1
     #Acorde a la presentacion de plasma del CERN
@@ -77,8 +75,8 @@ def chargevelocity(x,v,E):
         if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[j]:
             c1 = (pa.carga_e*(pa.coor_malla[j] - x[k])) #rho_i
             c2 = (pa.carga_e*(x[k] - pa.coor_malla[i])) #rho_i+1
-            E_particula[k] = E_particula[k] + (E[i]*c2 + E[j] * c1)
-            v[k] = v[k] - E_particula[k]*pa.dt  #pa.carga_e*E_particula[vel]*pa.dt
+            E_particula.append((E_malla[i]*c2 + E_malla[j] * c1))
+            v[k] = v[k] + pa.carga_e*E_particula[k]*pa.dt  #pa.carga_e*E_particula[vel]*pa.dt
             k = k + 1
         else:
             k = k + 1
@@ -95,27 +93,26 @@ def chargevelocity(x,v,E):
 
 
 
+
+
 def chargeposition(v_med):
     '''
     Implementando Ecuacion 9 de Martin.pdf
     '''
-    x = np.array([0.0]) #Condición necesaria para el método de integración Leap-Frog
+    x = [0 for pos in range (pa.noParticulas)] #Condición necesaria para el método de integración Leap-Frog
     # v_med = v0
     for i in range(pa.noParticulas):
-        pos = x[i] +  v_med[i] * pa.dt
-        x = np.append(x, pos)
-
+        x[i] = x[i] +  v_med[i] * pa.dt
     return x
 
 
 def cf(x_cf): ### ? Nunca usas x_cf, y no se por que regresar True R/: Las uso despues de moverlas las particulas, pero como aun no ha sucedido, jaja.
-    x = chargeposition()
     for i in range(pa.noParticulas):
-        if x[i] < pa.plasma_inicio: ### Faltan malla_inicio y malla_final en parametros.py #R/: era plasma_algo
-            x[i] += pa.plasma_final
-        elif x[i] > pa.plasma_final:
-            x[i] -= pa.plasma_final
-    return x
+        if x_cf[i] < pa.plasma_inicio: ### Faltan malla_inicio y malla_final en parametros.py #R/: era plasma_algo
+            x_cf[i] += pa.plasma_final
+        elif x_cf[i] > pa.plasma_final:
+            x_cf[i] -= pa.plasma_final
+    return x_cf
 
 
 
