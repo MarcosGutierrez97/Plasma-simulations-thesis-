@@ -28,18 +28,20 @@ potencialM = np.zeros(noMalla + 1)   #Potencial Magnetico
 
 #Variables principales
 E_particulaI = [0 for a in range (noParticulas)] #Campo individual aplicado a cada particula
-coor_malla = [i*2*np.pi for i in range(noMalla+1)]
+coor_malla = [i for i in range(noMalla+1)]
 #print(coor_malla)
 #print (len(coor_malla))
 x_inicial = np.zeros(noParticulas)
 v_inicial = np.zeros(noParticulas)
-malla_longitud = 2*np.pi #Tamano de la malla espacial
+malla_longitud = 1 #Tamano de la malla espacial
 plasma_inicio = 0
 plasma_final = malla_longitud
 dx = malla_longitud/noMalla
 dt = 0.05
 carga_masa = -1 #relacion carga masa
-rho = 1 #Densidad del fondo de iones (default)
+rho0 = 1 #Densidad del fondo de iones (default)
 velocidad_termica = 0.02
 x0 = 0.01 #perturbacion de amplitud
 v0 = 0.0 #perturbacion de velocidad
+densidadI = rho0
+print (densidadI)

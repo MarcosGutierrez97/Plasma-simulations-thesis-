@@ -30,7 +30,7 @@ def buildgrid_pos(x_0):
     #posiciones:
     x_i = pa.plasma_final - pa.plasma_inicio #Longitud de donde va a cargar la malla
     espacio_particulas = x_i / pa.noParticulas
-    carga = -pa.rho * espacio_particulas
+    carga = -pa.rho0 * espacio_particulas
     masa = carga/pa.carga_masa ### no se usa
 
     for i in range(pa.noParticulas):
@@ -100,7 +100,10 @@ def chargeposition(v_med):
     Implementando Ecuacion 9 de Martin.pdf
     '''
     x = [0 for pos in range (pa.noParticulas)] #Condición necesaria para el método de integración Leap-Frog
-    # v_med = v0
+    """
+    El error de la línea 64 de plasma frío igual salía si quitaba x = [0 for pos in range (pa.noParticulas)]
+    para hacer chargeposition(v,x) y así sumar el cambio a la posición anterior. No he podido descifrar porqué. 
+    """
     for i in range(pa.noParticulas):
         x[i] = x[i] +  v_med[i] * pa.dt
     return x
@@ -140,5 +143,7 @@ def chargedensity(x,charge_density):
             k = k + 1
             i = i + 2
             j = j + 2
+    charge_density[0] = charge_density[0] + charge_density[pa.noMalla]
+    charge_density[pa.noMalla] = charge_density[0]
 
     return charge_density

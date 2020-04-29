@@ -15,6 +15,8 @@ import matplotlib.pyplot as plt
 
 
 x_inicial = f.buildgrid_pos(pa.x_inicial) #Solo se hace una vez
+print (x_inicial)
+print (len(x_inicial))
 v_inicial = f.buildgrid_vel(pa.v_inicial) #Solo se hace una vez
 densidad_inicial = f.chargedensity(x_inicial,pa.densidadE)
 E_inicial = f.electricfield(densidad_inicial)
@@ -26,17 +28,17 @@ E_inicial = f.electricfield(densidad_inicial)
 
 
 i = 0
-j = 0
+p = 0
 e = 1
-posiciones= [x_inicial]
-velocidades = [v_inicial]
-densidades = [densidad_inicial]
-camposE = [E_inicial]
-camposE_particulas = [pa.E_particulaI]
+posiciones= []
+velocidades = []
+densidades = []
+camposE = []
+camposE_particulas = []
 tiempo = [0]
 
 
-while  i < 10:
+while  i < 4:
     if i == 0:
         posicion = f.chargeposition( v_inicial)
         posicion = f.cf(posicion)
@@ -47,19 +49,27 @@ while  i < 10:
         velocidades.append(velocidad)
         densidades.append(densidad)
         camposE.append(E)
-        camposE_particulas.append([v/(pa.carga_e*pa.dt) for v in velocidades[j]])
-        j = j + 1
+        #camposE_particulas.append([v/(pa.carga_e*pa.dt) for v in velocidades[j]])
     else:
-        posicion = f.chargeposition(velocidades[j])
+        posicion = f.chargeposition(velocidades[p])
         posicion = f.cf(posicion)
-        velocidad = f.chargevelocity(posiciones[j], velocidades[j], camposE[j], pa.E_particulaI)
-        densidad = f.chargedensity(posiciones[j], densidades[j])
-        E = f.electricfield(densidades[j])
+        velocidad = f.chargevelocity(posiciones[p], velocidades[p], camposE[p], pa.E_particulaI)
+        densidad = f.chargedensity(posiciones[p], densidades[p])
+        E = f.electricfield(densidades[p])
         posiciones.append(posicion)
         velocidades.append(velocidad)
         densidades.append(densidad)
         camposE.append(E)
-        camposE_particulas.append([v/(pa.carga_e*pa.dt) for v in velocidades[j]])
+        p = p + 1 #Cuando agrego esto mi tira error:
+        """
+        #File "C:\Users\HP\Documents\GitHub\Plasma-simulations-thesis-\Correcci�n 1\plasma frio.py", line 56, in <module>
+    #velocidad = f.chargevelocity(posiciones[p], velocidades[p], camposE[p], pa.E_particulaI)
+  #File "C:\Users\HP\Documents\GitHub\Plasma-simulations-thesis-\Correcci�n 1\funciones.py", line 75, in chargevelocity
+    #if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[j]:
+    """
+
+        #camposE_particulas.append([v/(pa.carga_e*pa.dt) for v in velocidades[j]])
+
     i = i + pa.dt
 
 
@@ -76,6 +86,7 @@ print (len(densidades))
 print ('campos')
 print (camposE)
 """
-
-plt.plot(posiciones[3], velocidades[3])
+for i in range(len(camposE)):
+    plt.plot(pa.coor_malla, camposE[i], 'r')
+plt.xlim(0,pa.malla_longitud)
 plt.show()
