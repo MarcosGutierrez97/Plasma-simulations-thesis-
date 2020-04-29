@@ -49,7 +49,7 @@ def buildgrid_vel(v_0):
 def electricfield(rho0): #Le di por trapecio porque un chingo lo hacian asi. ✓ virgo
     rho_neto = pa.densidadI + rho0
     integrante = pa.dx * sp.arange(pa.noMalla + 1)
-    Ex = integrate.cumtrapz(rho_neto, integrante, initial=integrante[0])
+    Ex = integrate.cumtrapz(rho_neto, integrante, initial=integrante[0]) #Integracion por trapecio
     E_i = sp.sum(Ex)
 
     #Condiciones de frontera
@@ -58,7 +58,7 @@ def electricfield(rho0): #Le di por trapecio porque un chingo lo hacian asi. ✓
     return Ex
 
 
-def chargevelocity(x,v,E_malla, E_anterior):
+def chargevelocity(x,v,E_malla):
     '''
     Implementando Ecuacion 8 de Martin.pdf
 
@@ -70,18 +70,20 @@ def chargevelocity(x,v,E_malla, E_anterior):
     j = 1#Contador para C_i+1
     #Acorde a la presentacion de plasma del CERN
     k = 0 #Contador de particulas
-    vel = 0
-    while k < (pa.noParticulas):
-        if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[j]:
-            c1 = (pa.carga_e*(pa.coor_malla[j] - x[k])) #rho_i
-            c2 = (pa.carga_e*(x[k] - pa.coor_malla[i])) #rho_i+1
-            E_particula.append((E_malla[i]*c2 + E_malla[j] * c1))
-            v[k] = v[k] + pa.carga_e*E_particula[k]*pa.dt  #pa.carga_e*E_particula[vel]*pa.dt
-            k = k + 1
-        else:
-            k = k + 1
-            i = i + 2
-            j = j + 2
+    malla = 0
+    while malla < (pa.noMalla):
+        while k < (pa.noParticulas): #Recorre las particulas
+            if (x[k] >= pa.coor_malla[i]) and (x[k] <= pa.coor_malla[j]): #Evalua que la particula este en alguna malla
+                c1 = (pa.coor_malla[j]-x[k]) #E_i
+                c2 = (x[k]-pa.coor_malla[i]) #E_i+1
+                E_particula.append((E_malla[i]*c1 + E_malla[j] * c2))
+                v[k] = v[k] + pa.carga_e*E_particula[k]*pa.dt  #pa.carga_e*E_particula[vel]*pa.dt
+                k = k + 1
+            else: #Si no esta en una malla, pasa a la siguiente y repite.
+                malla = malla + 1
+                k = k + 1
+                i = i + 2
+                j = j + 2
 
     #while vel < (pa.noParticulas):
         #v[vel] = v[vel] + pa.carga_e*E_particula[vel]*pa.dt
@@ -95,14 +97,12 @@ def chargevelocity(x,v,E_malla, E_anterior):
 
 
 
-def chargeposition(v_med):
+def chargeposition(v_med, x):
     '''
     Implementando Ecuacion 9 de Martin.pdf
     '''
-    x = [0 for pos in range (pa.noParticulas)] #Condición necesaria para el método de integración Leap-Frog
-    # v_med = v0
     for i in range(pa.noParticulas):
-        x[i] = x[i] +  v_med[i] * pa.dt
+        x[i] = x[i] +  v_med[i] * pa.dt #A la posicion anterior le suma lo necesario para llegar a la siguiente
     return x
 
 
@@ -124,21 +124,23 @@ def chargedensity(x,charge_density):
 
     i = 0 #Contador para C_i
     j = 1#Contador para C_i+1
-    malla = 0 #Contador de nodos
-    #Acorde a la presentacion de plasma del CERN
     k = 0
-
-
-    while k < (pa.noParticulas):
-        if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[j]:
-            c1 = (pa.carga_e*(pa.coor_malla[j] - x[k])) #rho_i
-            charge_density[i] = charge_density[i] + c1
-            c2 = (pa.carga_e*(x[k] - pa.coor_malla[i])) #rho_i+1
-            charge_density[j] = charge_density[j] + c2
-            k = k + 1
-        else:
-            k = k + 1
-            i = i + 2
-            j = j + 2
+    malla = 0
+    while malla < (pa.noMalla):
+        while k < (pa.noParticulas):
+            if (x[k] >= pa.coor_malla[i]) and (x[k] <= pa.coor_malla[j]): #Evalua que la particula este en alguna malla
+                c2 = ((pa.carga_e)*(x[k]-pa.coor_malla[i])) #rho_i+1
+                charge_density[j] = charge_density[j] + c2
+                c1 = (pa.carga_e*(pa.coor_malla[j]-x[k])) #rho_i
+                charge_density[i] = charge_density[i] + c1
+                k = k + 1
+            else: #Si no esta, pasa a la siguiente.
+                malla = malla + 0
+                k = k + 1
+                i = i + 2
+                j = j + 2
+            #Condiciones de frontera de la densidad de carga
+    charge_density[0] = charge_density[0] + charge_density[pa.noMalla]
+    charge_density[pa.noMalla] = charge_density[0]
 
     return charge_density
