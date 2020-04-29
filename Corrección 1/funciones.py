@@ -58,7 +58,7 @@ def electricfield(rho0): #Le di por trapecio porque un chingo lo hacian asi. ✓
     return Ex
 
 
-def chargevelocity(x,v,E_malla):
+def chargevelocity(x,v,E_malla, E_anterior):
     '''
     Implementando Ecuacion 8 de Martin.pdf
 
@@ -70,20 +70,18 @@ def chargevelocity(x,v,E_malla):
     j = 1#Contador para C_i+1
     #Acorde a la presentacion de plasma del CERN
     k = 0 #Contador de particulas
-    malla = 0
-    while malla < (pa.noMalla):
-        while k < (pa.noParticulas): #Recorre las particulas
-            if (x[k] >= pa.coor_malla[i]) and (x[k] <= pa.coor_malla[j]): #Evalua que la particula este en alguna malla
-                c1 = (pa.coor_malla[j]-x[k]) #E_i
-                c2 = (x[k]-pa.coor_malla[i]) #E_i+1
-                E_particula.append((E_malla[i]*c1 + E_malla[j] * c2))
-                v[k] = v[k] + pa.carga_e*E_particula[k]*pa.dt  #pa.carga_e*E_particula[vel]*pa.dt
-                k = k + 1
-            else: #Si no esta en una malla, pasa a la siguiente y repite.
-                malla = malla + 1
-                k = k + 1
-                i = i + 2
-                j = j + 2
+    vel = 0
+    while k < (pa.noParticulas):
+        if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[j]:
+            c1 = ((pa.coor_malla[j] - x[k])) #rho_i
+            c2 = ((x[k] - pa.coor_malla[i])) #rho_i+1
+            E_particula.append((E_malla[i]*c1 + E_malla[j] * c2))
+            v[k] = v[k] + pa.carga_e*E_particula[k]*pa.dt  #pa.carga_e*E_particula[vel]*pa.dt
+            k = k + 1
+        else:
+            k = k + 1
+            i = i + 2
+            j = j + 2
 
     #while vel < (pa.noParticulas):
         #v[vel] = v[vel] + pa.carga_e*E_particula[vel]*pa.dt
@@ -97,12 +95,14 @@ def chargevelocity(x,v,E_malla):
 
 
 
-def chargeposition(v_med, x):
+def chargeposition(v_med):
     '''
     Implementando Ecuacion 9 de Martin.pdf
     '''
+    x = [0 for pos in range (pa.noParticulas)] #Condición necesaria para el método de integración Leap-Frog
+    # v_med = v0
     for i in range(pa.noParticulas):
-        x[i] = x[i] +  v_med[i] * pa.dt #A la posicion anterior le suma lo necesario para llegar a la siguiente
+        x[i] = x[i] +  v_med[i] * pa.dt
     return x
 
 
