@@ -18,37 +18,29 @@ x_inicial = f.buildgrid_pos(pa.x_inicial) #Solo se hace una vez
 v_inicial = f.buildgrid_vel(pa.v_inicial) #Solo se hace una vez
 densidad_inicial = f.chargedensity(x_inicial,pa.densidadE)
 E_inicial = f.electricfield(densidad_inicial)
-"""
-print (x_inicial)
-print (len(x_inicial))
-print (v_inicial)
-print (len(v_inicial))
-print (densidad_inicial)
-print (len(densidad_inicial))
-print (E_inicial)
-print (len(E_inicial))
-"""
+
+
 
 
 #Se empieza a constuir el ciclo
 
 
-temp = 0 #Contador de tiempo
-j = 0 #Contador en listas
+i = 0
+j = 0
 e = 1
-posiciones= []
-velocidades = []
-densidades = []
-camposE = []
-camposE_particulas = []
+posiciones= [x_inicial]
+velocidades = [v_inicial]
+densidades = [densidad_inicial]
+camposE = [E_inicial]
+camposE_particulas = [pa.E_particulaI]
 tiempo = [0]
 
 
-while  temp < 1:
-    if temp == 0:
-        posicion = f.chargeposition( v_inicial,x_inicial)
+while  i < 10:
+    if i == 0:
+        posicion = f.chargeposition( v_inicial)
         posicion = f.cf(posicion)
-        velocidad = f.chargevelocity(x_inicial,v_inicial,E_inicial)
+        velocidad = f.chargevelocity(x_inicial, v_inicial, E_inicial,pa.E_particulaI)
         densidad = f.chargedensity(posicion, densidad_inicial)
         E = f.electricfield(densidad)
         posiciones.append(posicion)
@@ -56,42 +48,34 @@ while  temp < 1:
         densidades.append(densidad)
         camposE.append(E)
         camposE_particulas.append([v/(pa.carga_e*pa.dt) for v in velocidades[j]])
+        j = j + 1
     else:
-        posicion = f.chargeposition(velocidad,posicion)
+        posicion = f.chargeposition(velocidades[j])
         posicion = f.cf(posicion)
-        velocidad = f.chargevelocity(posicion,velocidad,E)
-        densidad = f.chargedensity(posicion, densidad)
-        E = f.electricfield(densidad)
+        velocidad = f.chargevelocity(posiciones[j], velocidades[j], camposE[j], pa.E_particulaI)
+        densidad = f.chargedensity(posiciones[j], densidades[j])
+        E = f.electricfield(densidades[j])
         posiciones.append(posicion)
         velocidades.append(velocidad)
         densidades.append(densidad)
         camposE.append(E)
         camposE_particulas.append([v/(pa.carga_e*pa.dt) for v in velocidades[j]])
-    temp = temp + pa.dt
-
+    i = i + pa.dt
 
 
 """
-print ('lista posiciones')
-print (posiciones)
+print ('posiciones')
+print ( posiciones)
 print (len(posiciones))
-print (posiciones[0])
-print (len(posiciones[0]))
-print ('valores de v')
-print (velocidades)
+print ('velocidades')
+print (  velocidades)
 print (len(velocidades))
-print (velocidades[0])
-print (len(velocidades[0]))
-print ('valores de E')
+print ('densidades')
+print ( densidades)
+print (len(densidades))
+print ('campos')
 print (camposE)
-print (len(camposE))
-print (camposE[0])
-print(len(camposE[0]))
 """
 
-#Densidad Neta (idea tomada del código del Cern)
-
-#plt.plot (pa.coor_malla,  camposE[2])
-#plt.xlabel('x')
-#plt.xlim(0,pa.malla_longitud)
-#plt.show()
+plt.plot(posiciones[3], velocidades[3])
+plt.show()
