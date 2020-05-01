@@ -58,7 +58,7 @@ def electricfield(rho0): #Le di por trapecio porque un chingo lo hacian asi. ✓
     return Ex
 
 
-def chargevelocity(x,v,E_malla, E_anterior):
+def chargevelocity(x,v,E_malla):
     '''
     Implementando Ecuacion 8 de Martin.pdf
 
@@ -71,38 +71,61 @@ def chargevelocity(x,v,E_malla, E_anterior):
     #Acorde a la presentacion de plasma del CERN
     k = 0 #Contador de particulas
     vel = 0
-    while k < (pa.noParticulas):
-        if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[j]:
-            c1 = ((pa.coor_malla[j] - x[k])) #rho_i
+    """
+    while i < (pa.noMalla):
+        if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[i + 1]:
+            c1 = ((pa.coor_malla[i + 1] - x[k])) #rho_i
             c2 = ((x[k] - pa.coor_malla[i])) #rho_i+1
-            E_particula.append((E_malla[i]*c1 + E_malla[j] * c2))
+            E_particula.append((E_malla[i]*c1 + E_malla[i + 1] * c2))
+            print (i)
+            print (k)
             v[k] = v[k] + pa.carga_e*E_particula[k]*pa.dt  #pa.carga_e*E_particula[vel]*pa.dt
             k = k + 1
+        elif k == (pa.noParticulas-1):
+            break
         else:
             k = k + 1
-            i = i + 2
-            j = j + 2
+            i = i + 1
+        print (len(v))
+        print (len(E_particula))
 
-    #while vel < (pa.noParticulas):
-        #v[vel] = v[vel] + pa.carga_e*E_particula[vel]*pa.dt
+    return v
+
+    """
+    for k in range (pa.noParticulas):
+        if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[i + 1]:
+            c1 = ((pa.coor_malla[i + 1] - x[k])) #rho_i
+            c2 = ((x[k] - pa.coor_malla[i])) #rho_i+1
+            E_particula.append((E_malla[i]*c1 + E_malla[i+1] * c2))
+            v[k] = v[k] + pa.carga_e*E_particula[k]*pa.dt
+            k = k + 1
+            #print ('k')
+            #print (k)
+            #print ('c1')
+            #print (c1)
+            #print ('c2')
+            #print (c2)
+            #print ('E')
+            #print (len(E_particula))
+            #print ('i')
+            #print (i)
+        elif x[k] > pa.coor_malla[i + 1]:
+            i = i + 1
+
+
+
 
     return v
 
 
-
-
-
-
-
-
-def chargeposition(v_med):
+def chargeposition(v_med, x):
     '''
     Implementando Ecuacion 9 de Martin.pdf
     '''
-    x = [0 for pos in range (pa.noParticulas)] #Condición necesaria para el método de integración Leap-Frog
+#Condición necesaria para el método de integración Leap-Frog
     """
     El error de la línea 64 de plasma frío igual salía si quitaba x = [0 for pos in range (pa.noParticulas)]
-    para hacer chargeposition(v,x) y así sumar el cambio a la posición anterior. No he podido descifrar porqué. 
+    para hacer chargeposition(v,x) y así sumar el cambio a la posición anterior. No he podido descifrar porqué.
     """
     for i in range(pa.noParticulas):
         x[i] = x[i] +  v_med[i] * pa.dt
@@ -124,7 +147,7 @@ def chargedensity(x,charge_density):
     Implementando Ecuaciones 20 y 21 de Martin.pdf
     Solo si X[0] = 0 (revisa que esto suceda) YA SUCEDE
     '''
-
+    charge_density = np.zeros(pa.noMalla + 1)
     i = 0 #Contador para C_i
     j = 1#Contador para C_i+1
     malla = 0 #Contador de nodos
@@ -133,16 +156,14 @@ def chargedensity(x,charge_density):
 
 
     while k < (pa.noParticulas):
-        if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[j]:
-            c1 = (pa.carga_e*(pa.coor_malla[j] - x[k])) #rho_i
+        if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[i + 1]:
+            c1 = (pa.carga_e*(pa.coor_malla[i + 1] - x[k])) #rho_i
             charge_density[i] = charge_density[i] + c1
             c2 = (pa.carga_e*(x[k] - pa.coor_malla[i])) #rho_i+1
-            charge_density[j] = charge_density[j] + c2
+            charge_density[i + 1] = charge_density[i + 1] + c2
             k = k + 1
-        else:
-            k = k + 1
-            i = i + 2
-            j = j + 2
+        elif x[k] > pa.coor_malla[i + 1]:
+            i = i + 1
     charge_density[0] = charge_density[0] + charge_density[pa.noMalla]
     charge_density[pa.noMalla] = charge_density[0]
 

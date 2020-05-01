@@ -28,7 +28,7 @@ potencialM = np.zeros(noMalla + 1)   #Potencial Magnetico
 
 #Variables principales
 E_particulaI = [0 for a in range (noParticulas)] #Campo individual aplicado a cada particula
-coor_malla = [i for i in range(noMalla+1)]
+coor_malla = [float(i) for i in range(noMalla+1)]
 #print(coor_malla)
 #print (len(coor_malla))
 x_inicial = np.zeros(noParticulas)
