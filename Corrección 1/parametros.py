@@ -45,3 +45,10 @@ x0 = 0.01 #perturbacion de amplitud
 v0 = 0.0 #perturbacion de velocidad
 densidadI = rho0
 print (densidadI)
+
+#Parametros energeticos
+ki =[0 for i in range (noParticulas)]
+kdrift =[0 for i in range (noParticulas)]
+upot =[0 for i in range (noParticulas)]
+totalenergy =[0 for i in range (noParticulas)]
+camposaP = [0 for i in range (noParticulas)]

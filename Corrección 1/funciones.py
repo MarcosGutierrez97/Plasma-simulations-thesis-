@@ -35,7 +35,7 @@ def buildgrid_pos(x_0):
 
     for i in range(pa.noParticulas):
         x_0[i] =  pa.plasma_inicio + espacio_particulas * (i + 0.5)
-        x_0[i] += pa.x0 * np.cos(x_0[i])
+        x_0[i] += pa.x0 * np.cos(2*np.pi*x_0[i])
     return x_0
 
 
@@ -71,27 +71,7 @@ def chargevelocity(x,v,E_malla):
     #Acorde a la presentacion de plasma del CERN
     k = 0 #Contador de particulas
     vel = 0
-    """
-    while i < (pa.noMalla):
-        if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[i + 1]:
-            c1 = ((pa.coor_malla[i + 1] - x[k])) #rho_i
-            c2 = ((x[k] - pa.coor_malla[i])) #rho_i+1
-            E_particula.append((E_malla[i]*c1 + E_malla[i + 1] * c2))
-            print (i)
-            print (k)
-            v[k] = v[k] + pa.carga_e*E_particula[k]*pa.dt  #pa.carga_e*E_particula[vel]*pa.dt
-            k = k + 1
-        elif k == (pa.noParticulas-1):
-            break
-        else:
-            k = k + 1
-            i = i + 1
-        print (len(v))
-        print (len(E_particula))
 
-    return v
-
-    """
     for k in range (pa.noParticulas):
         if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[i + 1]:
             c1 = ((pa.coor_malla[i + 1] - x[k])) #rho_i
@@ -99,23 +79,31 @@ def chargevelocity(x,v,E_malla):
             E_particula.append((E_malla[i]*c1 + E_malla[i+1] * c2))
             v[k] = v[k] + pa.carga_e*E_particula[k]*pa.dt
             k = k + 1
-            #print ('k')
-            #print (k)
-            #print ('c1')
-            #print (c1)
-            #print ('c2')
-            #print (c2)
-            #print ('E')
-            #print (len(E_particula))
-            #print ('i')
-            #print (i)
         elif x[k] > pa.coor_malla[i + 1]:
             i = i + 1
-
-
-
-
     return v
+
+def FieldParticle (x,E_malla): #Campo aplicado a cada particula
+    E_a_particula = []
+    i = 0 #Contador para C_i
+    j = 1#Contador para C_i+1
+    #Acorde a la presentacion de plasma del CERN
+    k = 0 #Contador de particulas
+    for k in range (pa.noParticulas):
+        if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[i + 1]:
+            c1 = ((pa.coor_malla[i + 1] - x[k])) #rho_i
+            c2 = ((x[k] - pa.coor_malla[i])) #rho_i+1
+            E_a_particula.append((E_malla[i]*c1 + E_malla[i+1] * c2))
+            #print (k)
+            k = k + 1
+
+        elif x[k] > pa.coor_malla[i + 1]:
+            i = i + 1
+    return E_a_particula
+
+
+
+
 
 
 def chargeposition(v_med, x):
@@ -168,3 +156,28 @@ def chargedensity(x,charge_density):
     charge_density[pa.noMalla] = charge_density[0]
 
     return charge_density
+
+def Kenergy(v):
+    vdrift = sum(v)/pa.noParticulas
+    v2 = []
+    ki = [0.0 for i in range(len(v))]
+    for i in range (len(v)):
+        v2.append ((v[i])**2)
+        ki[i] = (0.5*(sum(v2))) # masa = 1, por la normalizacion
+        #kdrift[i] = 0.5*vdrift*vdrift*pa.noParticulas #esta y la siguiente linea puede ser utiles
+        #therm[i] = ki[i]-kdrift[i]
+    return ki
+
+def Uenergy (Ex,upot):
+    e2 = []
+    Emax = max(Ex)
+    for i in range (pa.noParticulas):
+        e2.append((Ex[i])**2)
+        upot[i] = 0.5*pa.dx*sum(e2)
+
+    return upot
+
+def totalenergy (totalenergy,k,u):
+    for i in range(pa.noParticulas):
+        totalenergy[i] = k[i] + u[i]
+    return totalenergy
