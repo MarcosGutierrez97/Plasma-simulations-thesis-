@@ -19,12 +19,7 @@ from scipy import integrate
 puntos_malla = [i for i in range(pa.NoPpC)]
 
 """
-# TODO ESTO LO ESTOY HACIENDO SOLO PARA PLASMA FRIO, PERO LOS DEMAS CASOS SOLO SERIA DE AGREGAR DISTRIBUCIONES
-
-#Necesaria para rho y E
-def closed_range(start, stop, step=1):
-  dir = 1 if (step > 0) else -1
-  return range(start, stop + dir, step)
+# Todo ESTO LO ESTOY HACIENDO SOLO PARA PLASMA FRIO, PERO LOS DEMAS CASOS SOLO SERIA DE AGREGAR DISTRIBUCIONES
 
 def buildgrid_pos(x_0):
     #posiciones:
@@ -38,11 +33,16 @@ def buildgrid_pos(x_0):
         x_0[i] += pa.x0 * np.cos(2*np.pi*x_0[i])
     return x_0
 
+def leapfrog(x,v): #Necesaria para que el proceso de Leapfrog sea valido
+    for i in range (len(x)):
+        x[i] = x[i] + 0.5 * pa.dt * v[i]
+    return x
 
-def buildgrid_vel(v_0):
+
+def buildgrid_vel():
     #velocidades
     #plasma frio
-    v_0[1:pa.noParticulas] = 0
+    v_0 = [0.0 for i in range (pa.noParticulas)]
     return v_0
 
 
@@ -67,18 +67,12 @@ def chargevelocity(x,v,E_malla):
 
     E_particula = []
     i = 0 #Contador para C_i
-    j = 1#Contador para C_i+1
-    #Acorde a la presentacion de plasma del CERN
-    k = 0 #Contador de particulas
-    vel = 0
-
     for k in range (pa.noParticulas):
         if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[i + 1]:
-            c1 = ((pa.coor_malla[i + 1] - x[k])) #rho_i
-            c2 = ((x[k] - pa.coor_malla[i])) #rho_i+1
+            c1 = ((pa.carga_e/pa.dx)*(pa.coor_malla[i + 1] - x[k])) #rho_i
+            c2 = ((pa.carga_e/pa.dx)*(x[k] - pa.coor_malla[i])) #rho_i+1
             E_particula.append((E_malla[i]*c1 + E_malla[i+1] * c2))
             v[k] = v[k] + pa.carga_e*E_particula[k]*pa.dt
-            k = k + 1
         elif x[k] > pa.coor_malla[i + 1]:
             i = i + 1
     return v
@@ -86,16 +80,12 @@ def chargevelocity(x,v,E_malla):
 def FieldParticle (x,E_malla): #Campo aplicado a cada particula
     E_a_particula = []
     i = 0 #Contador para C_i
-    j = 1#Contador para C_i+1
     #Acorde a la presentacion de plasma del CERN
-    k = 0 #Contador de particulas
     for k in range (pa.noParticulas):
         if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[i + 1]:
-            c1 = ((pa.coor_malla[i + 1] - x[k])) #rho_i
-            c2 = ((x[k] - pa.coor_malla[i])) #rho_i+1
+            c1 = ((pa.carga_e/pa.dx)*(pa.coor_malla[i + 1] - x[k])) #rho_i
+            c2 = ((pa.carga_e/pa.dx)*(x[k] - pa.coor_malla[i])) #rho_i+1
             E_a_particula.append((E_malla[i]*c1 + E_malla[i+1] * c2))
-            #print (k)
-            k = k + 1
 
         elif x[k] > pa.coor_malla[i + 1]:
             i = i + 1
@@ -130,7 +120,7 @@ def cf(x_cf): ### ? Nunca usas x_cf, y no se por que regresar True R/: Las uso d
 
 
 
-def chargedensity(x,charge_density):
+def chargedensity(x):
     '''
     Implementando Ecuaciones 20 y 21 de Martin.pdf
     Solo si X[0] = 0 (revisa que esto suceda) YA SUCEDE
@@ -139,16 +129,11 @@ def chargedensity(x,charge_density):
     i = 0 #Contador para C_i
     j = 1#Contador para C_i+1
     malla = 0 #Contador de nodos
-    #Acorde a la presentacion de plasma del CERN
     k = 0
-
-
+    #Acorde a la presentacion de plasma del CERN
     while k < (pa.noParticulas):
         if x[k] >= pa.coor_malla[i] and x[k] <= pa.coor_malla[i + 1]:
-            c1 = (pa.carga_e*(pa.coor_malla[i + 1] - x[k])) #rho_i
-            charge_density[i] = charge_density[i] + c1
-            c2 = (pa.carga_e*(x[k] - pa.coor_malla[i])) #rho_i+1
-            charge_density[i + 1] = charge_density[i + 1] + c2
+            charge_density[i] = pa.carga_e*(1-abs(x[k]-pa.coor_malla[i])/pa.dx)
             k = k + 1
         elif x[k] > pa.coor_malla[i + 1]:
             i = i + 1
@@ -159,11 +144,11 @@ def chargedensity(x,charge_density):
 
 def Kenergy(v):
     vdrift = sum(v)/pa.noParticulas
-    v2 = []
+    #v2 = []
     ki = [0.0 for i in range(len(v))]
     for i in range (len(v)):
-        v2.append ((v[i])**2)
-        ki[i] = (0.5*(sum(v2))) # masa = 1, por la normalizacion
+        #v2.append ((v[i])**2)
+        ki[i] = (0.5*((v[i])**2)) # masa = 1, por la normalizacion
         #kdrift[i] = 0.5*vdrift*vdrift*pa.noParticulas #esta y la siguiente linea puede ser utiles
         #therm[i] = ki[i]-kdrift[i]
     return ki

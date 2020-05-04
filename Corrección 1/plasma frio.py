@@ -15,13 +15,13 @@ import matplotlib.pyplot as plt
 
 
 x_inicial = f.buildgrid_pos(pa.x_inicial) #Solo se hace una vez
-#print (len(x_inicial))
-v_inicial = f.buildgrid_vel(pa.v_inicial) #Solo se hace una vez
-#print (len(v_inicial))
-densidad_inicial = f.chargedensity(x_inicial,pa.densidadE)
+print(len(x_inicial))
+v_inicial = f.buildgrid_vel() #Solo se hace una vez
+print(len(v_inicial))
+x_inicial = f.leapfrog(x_inicial,v_inicial)
+densidad_inicial = f.chargedensity(x_inicial)
 E_inicial = f.electricfield(densidad_inicial)
 E_particulas_inicial = f.FieldParticle(x_inicial,E_inicial)
-print (len(E_particulas_inicial))
 #K_inicial = f.Kenergy(pa.ki,pa.v_inicial)
 #print (len(K_inicial))
 #U_inicial = f.Uenergy(E_particulas_inicial,pa.upot)
@@ -54,33 +54,32 @@ energiacinetica = []
 
 
 
-while  i <= 5*pa.dt:
+while  i < 0.3:
     if i == 0:
         posicion = f.chargeposition( v_inicial,x_inicial)
         posicion = f.cf(posicion)
         velocidad = f.chargevelocity(x_inicial, v_inicial, E_inicial)
-        densidad = f.chargedensity(posicion, densidad_inicial)
+        densidad = f.chargedensity(posicion)
         E = f.electricfield(densidad)
         K = f.Kenergy(v_inicial)
-        posiciones.append(posicion)
-        velocidades.append(velocidad)
-        densidades.append(densidad)
-        camposE.append(E)
-        energiacinetica.append(K)
-        print (len(posicion))
+        posiciones = np.append(posiciones, posicion)
+        velocidades = np.append(velocidades,velocidad)
+        densidades = np.append(densidades, densidad)
+        camposE = np.append(camposE, E)
+        energiacinetica = np.append(energiacinetica, K)
         #camposE_particulas.append([v/(pa.carga_e*pa.dt) for v in velocidades[j]])
     else:
         posicion = f.chargeposition(velocidad, posicion)
         posicion = f.cf(posicion)
         velocidad = f.chargevelocity(posicion, velocidad, E)
-        densidad = f.chargedensity(posicion, densidad)
+        densidad = f.chargedensity(posicion)
         E = f.electricfield(densidad)
         K = f.Kenergy(velocidad)
-        posiciones.append(posicion)
-        velocidades.append(velocidad)
-        densidades.append(densidad)
-        camposE.append(E)
-        energiacinetica.append(K)
+        posiciones = np.append(posiciones, posicion)
+        velocidades = np.append(velocidades, velocidad)
+        densidades = np.append(densidades, densidad)
+        camposE = np.append(camposE, E)
+        energiacinetica = np.append(energiacinetica, K)
         p = p + 1 #Cuando agrego esto mi tira error:
 
 
@@ -89,7 +88,11 @@ while  i <= 5*pa.dt:
     i = i + pa.dt
     tiempo.append(i)
 
-
+posiciones = [posiciones[i:i + pa.noParticulas] for i in range (0, len(posiciones),pa.noParticulas)]
+velocidades = [velocidades[i:i + pa.noParticulas] for i in range (0, len(velocidades),pa.noParticulas)]
+camposE = [camposE[i:i+pa.noMalla+1] for i in range(0,len(camposE),pa.noMalla+1)]
+densidades = [densidades[i:i+pa.noMalla+1] for i in range(0,len(densidades),pa.noMalla+1)]
+energiacinetica = [energiacinetica[i:i+pa.noParticulas] for i in range (0,len(energiacinetica),pa.noParticulas)]
 """
 print ('posiciones')
 print ( posiciones)
@@ -103,23 +106,34 @@ print (len(densidades))
 print ('campos')
 print (camposE)
 """
-print (len(tiempo))
-print (len(energiacinetica))
 
-graf_vel = [] # campo electrico en un solo nodo
-for i in range (len(velocidades)):
-    print (max(velocidades[i]))
-    print (min(velocidades[i]))
-    #graf_vel.append(((energiacinetica[i][0])))
-    graf_vel.append(((velocidades[i][5]))) #Cambie la grafica de E por la de K. K de una particula en el tiempo
-
-plt.plot(tiempo, graf_vel)
-plt.ylim(2.075,2.1)
+#Campo electrico en el tiempo
+"""
+grafE = []
+for i in range(len(camposE)):
+    grafE.append(camposE[i][0]) #nodo 0
+plt.plot(tiempo,grafE)
 plt.show()
 """
-Cuando veo las graficas del campo de Martin, veo que oscila bien bonito, jaja.
-No se si la diferencia sera en que integre por trapecio y Martin uso FFT
-o si habre cometido algun error. Tambien, la grafica de K sale exponencial y deberia oscilar.
-Tambien, en las pruebas para graficar la velocidad que estaba haciendo arriba, vi que las
-velocidades no se estan sumando, y no logre ver porque. 
 """
+grafK = []
+for i in range(len(energiacinetica)):
+    grafK.append(energiacinetica[i][i])
+plt.plot(tiempo, grafK)
+plt.show()
+"""
+
+#Diagramas de fase de la particula 0
+x = []
+y = []
+
+#xgrid = pa.dx*np.arange(pa.noMalla + 1)
+#plt.scatter(xgrid, -(pa.densidadI + densidades[3]))
+
+#plt.scatter(xgrid, camposE[1])
+#plt.xlim(0,pa.malla_longitud)
+#plt.ylim(-1,-0.75)
+#plt.show()
+print (len(densidades))
+print (posiciones[1])
+print(velocidades[1])
