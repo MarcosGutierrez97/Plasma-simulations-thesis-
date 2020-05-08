@@ -22,6 +22,7 @@ velocidades = np.zeros(noParticulas)
 
 densidadE = np.zeros(noMalla + 1) #Densidad de electrones
 densidadI = np.zeros(noMalla + 1) #Densidad de iones (el fondo de la malla)
+densidadIg = [1 for i in range (noMalla + 1)]
 #print(densidadE)
 CampoEx = np.zeros(noMalla + 1)     #Campo electrico
 potencialM = np.zeros(noMalla + 1)   #Potencial Magnetico
@@ -47,8 +48,8 @@ densidadI = rho0
 print (densidadI)
 
 #Parametros energeticos
-ki =[0 for i in range (noParticulas)]
+ki =np.zeros(101)
 kdrift =[0 for i in range (noParticulas)]
-upot =[0 for i in range (noParticulas)]
+upot =np.zeros(101)
 totalenergy =[0 for i in range (noParticulas)]
 camposaP = [0 for i in range (noParticulas)]

@@ -48,7 +48,7 @@ def buildgrid_vel():
 
 
 def electricfield(rho0): #Le di por trapecio porque un chingo lo hacian asi. ✓ virgo
-    rho_neto = pa.densidadI + rho0
+    rho_neto = pa.densidadIg + rho0
     integrante = pa.dx * sp.arange(pa.noMalla + 1)
     Ex = integrate.cumtrapz(rho_neto, integrante, initial=integrante[0])
     E_i = sp.sum(Ex)
@@ -59,33 +59,20 @@ def electricfield(rho0): #Le di por trapecio porque un chingo lo hacian asi. ✓
     return Ex
 
 
-def chargevelocity(x,v,E_malla):
+def chargevelocity(x,v, E_malla):
     '''
     Implementando Ecuacion 8 de Martin.pdf
 
     '''
     #Extrapolación del campo eléctrico (no lo había puesto)
-
-    E_particula = []
-    i = 0 #Contador para C_i
     for k in range (pa.noParticulas):
         xa = x[k]/pa.dx
         j1 = int(xa)
-        print (j1)
         j2 = j1 + 1
-        print (j2)
         f2 = xa - j1
         f1 = 1.0 - f2
         ex = f1*E_malla[j1] + f2*E_malla[j2]
         v[k] = v[k] + pa.carga_e*pa.dt*ex
-    '''
-    for k in range (pa.noParticulas):
-        if int(x[k]/pa.dx) >= pa.coor_malla[i] and int(x[k]/pa.dx) <= pa.coor_malla[i + 1]:
-            E_particula.append((E_malla[i]*(1-(int(x[k]/pa.dx)-i)) + E_malla[i+1] *(int(x[k]/pa.dx)-i)))
-            v[k] = v[k] + pa.carga_e*E_particula[k]*pa.dt
-        elif x[k] > pa.coor_malla[i + 1]:
-            i = i + 1
-    '''
     return v
 
 def FieldParticle (x,E_malla): #Campo aplicado a cada particula
@@ -121,10 +108,12 @@ def chargeposition(v_med, x):
 
 def cf(x_cf): ### ? Nunca usas x_cf, y no se por que regresar True R/: Las uso despues de moverlas las particulas, pero como aun no ha sucedido, jaja.
     for i in range(pa.noParticulas):
-        if x_cf[i] < pa.plasma_inicio: ### Faltan malla_inicio y malla_final en parametros.py #R/: era plasma_algo
-            x_cf[i] += pa.plasma_final
+        if x_cf[i] < pa.plasma_inicio:
+            while x_cf[i] < pa.plasma_inicio:
+                x_cf[i] += pa.plasma_final
         elif x_cf[i] > pa.plasma_final:
-            x_cf[i] -= pa.plasma_final
+            while x_cf[i] > pa.plasma_final:
+                x_cf[i] -= pa.plasma_final
     return x_cf
 
 
@@ -135,12 +124,8 @@ def chargedensity(x):
     Solo si X[0] = 0 (revisa que esto suceda) YA SUCEDE
     '''
     charge_density = np.zeros(pa.noMalla + 1)
-    re = pa.carga_e/pa.dx
-    i = 0 #Contador para C_i
-    j = 1#Contador para C_i+1
-    malla = 0 #Contador de nodos
-    #k = 0
-    #Acorde a la presentacion de plasma del CERN
+    qe = -1*((pa.plasma_final-pa.plasma_inicio)/pa.noParticulas)
+    re = (qe/pa.dx)
     for k in range (pa.noParticulas):
         xa = x[k]/pa.dx
         j1 = int(xa)
@@ -156,31 +141,27 @@ def chargedensity(x):
             k = k + 1
         elif x[k] > pa.coor_malla[i + 1]:
             i = i + 1
+        """
     charge_density[0] = charge_density[0] + charge_density[pa.noMalla]
     charge_density[pa.noMalla] = charge_density[0]
-    """
+
 
     return charge_density
 
-def Kenergy(v):
-    vdrift = sum(v)/pa.noParticulas
-    #v2 = []
-    ki = [0.0 for i in range(len(v))]
-    for i in range (len(v)):
-        #v2.append ((v[i])**2)
-        ki[i] = (0.5*((v[i])**2)) # masa = 1, por la normalizacion
-        #kdrift[i] = 0.5*vdrift*vdrift*pa.noParticulas #esta y la siguiente linea puede ser utiles
-        #therm[i] = ki[i]-kdrift[i]
-    return ki
+def Kenergy(v,step):
+    v2 = []
+    for i in range(len(v)):
+        v2.append(v[i]**2)
+    pa.ki[step] = 0.5*1*sum(v2)
+    return pa.ki
 
-def Uenergy (Ex,upot):
+def Uenergy (Ex,step):
     e2 = []
-    Emax = max(Ex)
-    for i in range (pa.noParticulas):
+    for i in range (len(Ex)):
         e2.append((Ex[i])**2)
-        upot[i] = 0.5*pa.dx*sum(e2)
+    pa.upot[step] = 0.5*pa.dx*sum(e2)
+    return pa.upot
 
-    return upot
 
 def totalenergy (totalenergy,k,u):
     for i in range(pa.noParticulas):
@@ -189,9 +170,10 @@ def totalenergy (totalenergy,k,u):
 
 
 #Funciones para graficar
-
-def diagnosticos(densidad, E, t, graf):
+"""
+def diagnosticos(t):
     xgrid =pa.dx*np.arange(pa.noMalla + 1)
+    graf = (np.pi/pa.dt/16)
     if t == 0:
         plt.figure('Campos')
         plt.clf()
@@ -201,15 +183,16 @@ def diagnosticos(densidad, E, t, graf):
                 plt.subplot(2,2,1)
                 if t > 0:
                     plt.cla()
-                plt.plot(xgrid, -(pa.densidadI + densidad),'r', label = 'densidad')
+                plt.plot(xgrid, -(pa.densidadI + chargedensity(x)),'r', label = 'densidad')
                 plt.xlabel('x')
                 plt.xlim(0,pa.malla_longitud)
                 #Campo electrico
                 plt.subplot(2,2,2)
                 if t > 0:
                     plt.cla()
-                plt.plot(xgrid, E, 'b', label = 'Campo electrico')
+                plt.plot(xgrid, electricfield(rho0), 'b', label = 'Campo electrico')
                 plt.xlabel('x')
                 plt.xlim(0,pa.malla_longitud)
                 plt.show()
     return True
+"""
