@@ -27,7 +27,7 @@ def buildgrid_pos(x_0):
     x_i = pa.plasma_final - pa.plasma_inicio #Longitud de donde va a cargar la malla
     espacio_particulas = x_i / pa.noParticulas
     carga = -pa.rho0 * espacio_particulas
-    masa = carga/pa.carga_masa ### no se usa
+    masa = carga/pa.carga_masa
 
     for i in range(pa.noParticulas):
         x_0[i] =  pa.plasma_inicio + espacio_particulas * (i + 0.5)
@@ -43,18 +43,28 @@ def leapfrog(x,v): #Necesaria para que el proceso de Leapfrog sea valido
 def buildgrid_vel():
     #velocidades
     #plasma frio
-    v_0 = [0.0 for i in range (pa.noParticulas)]
+    v_0 = np.zeros(pa.noParticulas)
+    v_0[1:pa.noParticulas] = 0.0
+
     return v_0
 
 
 def electricfield(rho0): #Le di por trapecio porque un chingo lo hacian asi. ✓ virgo
-    rho_neto = pa.densidadIg + rho0
+    rho_neto = 1.0 + rho0
+
     integrante = pa.dx * sp.arange(pa.noMalla + 1)
     Ex = integrate.cumtrapz(rho_neto, integrante, initial=integrante[0])
     E_i = sp.sum(Ex)
+    """
+    Ex[pa.noMalla] = 0.0
+    edc = 0.0
+    for j in range(pa.noMalla-1,-1,-1):
+      Ex[j] = Ex[j+1] - 0.5*( rho_neto[j] + rho_neto[j+1] )*pa.dx
+      edc = edc + Ex[j]
+    """
 
     #Condiciones de frontera
-    Ex[0:pa.noMalla] = E_i / pa.noMalla
+    Ex[0:pa.noMalla] -= E_i / pa.noMalla
     Ex[pa.noMalla] = Ex[0]
     return Ex
 
@@ -75,21 +85,6 @@ def chargevelocity(x,v, E_malla):
         v[k] = v[k] + pa.carga_e*pa.dt*ex
     return v
 
-def FieldParticle (x,E_malla): #Campo aplicado a cada particula
-    E_a_particula = []
-    i = 0 #Contador para C_i
-    #Acorde a la presentacion de plasma del CERN
-    for k in range (pa.noParticulas):
-        if (x[k]/pa.dx) >= pa.coor_malla[i] and (x[k]/pa.dx) <= pa.coor_malla[i + 1]:
-            E_a_particula.append((E_malla[i]*(1-((x[k]/pa.dx)-i)) + E_malla[i+1] *((x[k]/pa.dx)-i)))
-
-        elif x[k] > pa.coor_malla[i + 1]:
-            i = i + 1
-    return E_a_particula
-
-
-
-
 
 
 def chargeposition(v_med, x):
@@ -97,10 +92,6 @@ def chargeposition(v_med, x):
     Implementando Ecuacion 9 de Martin.pdf
     '''
 #Condición necesaria para el método de integración Leap-Frog
-    """
-    El error de la línea 64 de plasma frío igual salía si quitaba x = [0 for pos in range (pa.noParticulas)]
-    para hacer chargeposition(v,x) y así sumar el cambio a la posición anterior. No he podido descifrar porqué.
-    """
     for i in range(pa.noParticulas):
         x[i] = x[i] +  v_med[i] * pa.dt
     return x
@@ -109,11 +100,11 @@ def chargeposition(v_med, x):
 def cf(x_cf): ### ? Nunca usas x_cf, y no se por que regresar True R/: Las uso despues de moverlas las particulas, pero como aun no ha sucedido, jaja.
     for i in range(pa.noParticulas):
         if x_cf[i] < pa.plasma_inicio:
-            while x_cf[i] < pa.plasma_inicio:
-                x_cf[i] += pa.plasma_final
+            #while x_cf[i] < pa.plasma_inicio:
+            x_cf[i] += pa.plasma_final
         elif x_cf[i] > pa.plasma_final:
-            while x_cf[i] > pa.plasma_final:
-                x_cf[i] -= pa.plasma_final
+            #while x_cf[i] > pa.plasma_final:
+            x_cf[i] -= pa.plasma_final
     return x_cf
 
 
@@ -123,6 +114,8 @@ def chargedensity(x):
     Implementando Ecuaciones 20 y 21 de Martin.pdf
     Solo si X[0] = 0 (revisa que esto suceda) YA SUCEDE
     '''
+    j1=np.dtype(np.int32)
+    j2=np.dtype(np.int32)
     charge_density = np.zeros(pa.noMalla + 1)
     qe = -1*((pa.plasma_final-pa.plasma_inicio)/pa.noParticulas)
     re = (qe/pa.dx)
@@ -134,39 +127,32 @@ def chargedensity(x):
         f1 = 1.0 - f2
         charge_density[j1] = charge_density[j1] + re*f1
         charge_density[j2] = charge_density[j2] + re*f2
-        """
-        if int(x[k]/pa.dx)>= pa.coor_malla[i] and int(x[k]/pa.dx) <= pa.coor_malla[i + 1]:
-            charge_density[i] = charge_density[i] + pa.carga_e*(1-i-int(x[k]/pa.dx))
-            charge_density[i + 1] = charge_density[i + 1] + pa.carga_e*(int(x[k]/pa.dx)-i)
-            k = k + 1
-        elif x[k] > pa.coor_malla[i + 1]:
-            i = i + 1
-        """
-    charge_density[0] = charge_density[0] + charge_density[pa.noMalla]
+        
+    charge_density[0] += charge_density[pa.noMalla]
     charge_density[pa.noMalla] = charge_density[0]
 
 
     return charge_density
 
 def Kenergy(v,step):
-    v2 = []
-    for i in range(len(v)):
-        v2.append(v[i]**2)
-    pa.ki[step] = 0.5*1*sum(v2)
+    x_i = pa.plasma_final - pa.plasma_inicio #Longitud de donde va a cargar la malla
+    espacio_particulas = x_i / pa.noParticulas
+    carga = -pa.rho0 * espacio_particulas
+    m = carga/pa.carga_masa
+    v2 = [x**2 for x in v]
+    pa.ki[step] = pa.ki[step] + 0.5*m*sum(v2)
     return pa.ki
 
 def Uenergy (Ex,step):
-    e2 = []
-    for i in range (len(Ex)):
-        e2.append((Ex[i])**2)
-    pa.upot[step] = 0.5*pa.dx*sum(e2)
+    e2 = [x**2 for x in Ex]
+    pa.upot[step] =pa.upot[step] + 0.5*pa.dx*sum(e2)
     return pa.upot
 
 
-def totalenergy (totalenergy,k,u):
-    for i in range(pa.noParticulas):
-        totalenergy[i] = k[i] + u[i]
-    return totalenergy
+def totalenergy (k,u):
+    for i in range(pa.noMalla):
+        pa.totalenergy[i] = k[i] + u[i]
+    return pa.totalenergy
 
 
 #Funciones para graficar

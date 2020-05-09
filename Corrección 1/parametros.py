@@ -34,7 +34,7 @@ coor_malla = [float(i) for i in range(noMalla+1)]
 #print (len(coor_malla))
 x_inicial = np.zeros(noParticulas)
 v_inicial = np.zeros(noParticulas)
-malla_longitud = 1 #Tamano de la malla espacial
+malla_longitud = 2.0*np.pi #Tamano de la malla espacial
 plasma_inicio = 0
 plasma_final = malla_longitud
 dx = malla_longitud/noMalla
@@ -48,8 +48,8 @@ densidadI = rho0
 print (densidadI)
 
 #Parametros energeticos
-ki =np.zeros(101)
+ki =[0.0 for i in range (noMalla + 1)]
 kdrift =[0 for i in range (noParticulas)]
-upot =np.zeros(101)
-totalenergy =[0 for i in range (noParticulas)]
+upot =[0.0 for i in range (noMalla + 1)]
+totalenergy =[0.0 for i in range (noMalla + 1)]
 camposaP = [0 for i in range (noParticulas)]
