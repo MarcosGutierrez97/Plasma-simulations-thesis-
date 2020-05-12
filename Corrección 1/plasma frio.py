@@ -20,8 +20,8 @@ posicion1 = f.leapfrog(posicion1,velocidad1)
 posicion1 = f.cf(posicion1)
 densidad1 = f.chargedensity(posicion1)
 E1 = f.electricfield(densidad1)
-K1 = f.Kenergy(velocidad1,step)
-U1 = f.Uenergy(E1,step)
+K1 = f.Kenergy(velocidad1,0)
+U1 = f.Uenergy(E1,0)
 T1 = f.totalenergy(K1,U1)
 
 
@@ -35,15 +35,15 @@ velocidades = [velocidad1]
 densidades = [densidad1]
 camposE = [E1]
 #camposE_particulas = [E_particulas_inicial]
-tiempo = []
-energiacinetica = []
-energiapotencial = []
-energiatotal = []
+tiempo = [0]
+energiacinetica = [K1]
+energiapotencial = [U1]
+energiatotal = [T1]
 
 
 
 
-while  t < 100*pa.dt:
+while  t < pa.time_step*pa.dt:
     if t == 0:
         posicion = posicion1
         posicion = f.cf(posicion)

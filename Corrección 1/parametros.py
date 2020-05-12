@@ -8,10 +8,12 @@ import numpy as np
 
 #Parametros del experimentos (tomados de Brisdall et tal)
 
-noParticulas = 10000 #Numero de particulas
+noParticulas = 2000 #Numero de particulas
 noMalla = 100 #puntos de la malla
 carga_e = -1 #electron
 carga_i = 1 #ion
+time_step = 100
+vh = 8 #velocidad media del haz. Para pruebas 2-stream y Beam Stream
 
 #Arrays de las particulas
 
@@ -38,18 +40,18 @@ malla_longitud = 2.0*np.pi #Tamano de la malla espacial
 plasma_inicio = 0
 plasma_final = malla_longitud
 dx = malla_longitud/noMalla
-dt = 0.05
+dt = 0.1
 carga_masa = -1 #relacion carga masa
 rho0 = 1 #Densidad del fondo de iones (default)
 velocidad_termica = 0.02
 x0 = 0.01 #perturbacion de amplitud
-v0 = 0.0 #perturbacion de velocidad
+v0 = 0.1 #perturbacion de velocidad
 densidadI = rho0
 print (densidadI)
 
 #Parametros energeticos
-ki =[0.0 for i in range (noMalla + 1)]
+ki =[0.0 for i in range (time_step + 1)]
 kdrift =[0 for i in range (noParticulas)]
-upot =[0.0 for i in range (noMalla + 1)]
-totalenergy =[0.0 for i in range (noMalla + 1)]
+upot =[0.0 for i in range (time_step + 1)]
+totalenergy =[0.0 for i in range (time_step + 1)]
 camposaP = [0 for i in range (noParticulas)]
