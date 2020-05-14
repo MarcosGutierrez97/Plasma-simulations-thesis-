@@ -35,10 +35,10 @@ velocidades = [velocidad1]
 densidades = [densidad1]
 camposE = [E1]
 #camposE_particulas = [E_particulas_inicial]
-tiempo = [0]
-energiacinetica = [K1]
-energiapotencial = [U1]
-energiatotal = [T1]
+tiempo = []
+energiacinetica = []
+energiapotencial = []
+energiatotal = []
 
 
 

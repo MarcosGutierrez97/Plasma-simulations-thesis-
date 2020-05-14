@@ -25,14 +25,16 @@ puntos_malla = [i for i in range(pa.NoPpC)]
 
 def buildgrid_pos(x_0):
     #posiciones:
-    x_i = pa.plasma_final - pa.plasma_inicio #Longitud de donde va a cargar la malla
+    plasma_inicio = 0.0
+    plasma_final = pa.malla_longitud
+    x_i = plasma_final - plasma_inicio #Longitud de donde va a cargar la malla
     espacio_particulas = x_i / pa.noParticulas
     carga = -pa.rho0 * espacio_particulas
     masa = carga/pa.carga_e
 
     for i in range(pa.noParticulas):
-        x_0[i] =  pa.plasma_inicio + espacio_particulas * (i + 0.5)
-        x_0[i] += pa.x0 * np.cos(2*np.pi*x_0[i])
+        x_0[i] =  plasma_inicio + espacio_particulas * (i + 0.5)
+        x_0[i] += pa.x0 * np.cos(x_0[i])
     return x_0
 
 def leapfrog(x,v): #Necesaria para que el proceso de Leapfrog sea valido
@@ -52,22 +54,22 @@ def buildgrid_vel():
 
 def electricfield(rho0): #Le di por trapecio porque un chingo lo hacian asi. ✓ virgo
     rho_neto = 1.0 + rho0
-
+    """
     integrante = pa.dx * sp.arange(pa.noMalla + 1)
     Ex = integrate.cumtrapz(rho_neto, integrante, initial=integrante[0])
     E_i = sp.sum(Ex)
     """
-    Ex[pa.noMalla] = 0.0
+    pa.campoEx[pa.noMalla] = 0.0
     E_i = 0.0
     for j in range(pa.noMalla-1,-1,-1):
-      Ex[j] = Ex[j+1] - 0.5*( rho_neto[j] + rho_neto[j+1] )*pa.dx
-      E_i = E_i + Ex[j]
-    """
+      pa.campoEx[j] = pa.campoEx[j+1] - 0.5*( rho_neto[j] + rho_neto[j+1] )*pa.dx
+      E_i = E_i + pa.campoEx[j]
+
 
     #Condiciones de frontera
-    Ex[0:pa.noMalla] -= E_i / pa.noMalla
-    Ex[pa.noMalla] = Ex[0]
-    return Ex
+    pa.campoEx[0:pa.noMalla] -= E_i / pa.noMalla
+    pa.campoEx[pa.noMalla] = pa.campoEx[0]
+    return pa.campoEx
 
 
 def chargevelocity(x,v, E_malla):
@@ -118,7 +120,7 @@ def chargedensity(x):
     j1=np.dtype(np.int32)
     j2=np.dtype(np.int32)
     charge_density = np.zeros(pa.noMalla + 1)
-    qe = -1*((pa.plasma_final-pa.plasma_inicio)/pa.noParticulas)
+    qe = -pa.rho0*((pa.plasma_final-pa.plasma_inicio)/pa.noParticulas)
     re = (qe/pa.dx)
     for k in range (pa.noParticulas):
         xa = x[k]/pa.dx

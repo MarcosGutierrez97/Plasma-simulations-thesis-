@@ -8,11 +8,11 @@ import numpy as np
 
 #Parametros del experimentos (tomados de Brisdall et tal)
 
-noParticulas = 2000 #Numero de particulas
+noParticulas = 10000 #Numero de particulas
 noMalla = 100 #puntos de la malla
 carga_e = -1 #electron
 carga_i = 1 #ion
-time_step = 100
+time_step = 1000
 vh = 8 #velocidad media del haz. Para pruebas 2-stream y Beam Stream
 
 #Arrays de las particulas
@@ -26,7 +26,7 @@ densidadE = np.zeros(noMalla + 1) #Densidad de electrones
 densidadI = np.zeros(noMalla + 1) #Densidad de iones (el fondo de la malla)
 densidadIg = [1 for i in range (noMalla + 1)]
 #print(densidadE)
-CampoEx = np.zeros(noMalla + 1)     #Campo electrico
+campoEx = np.zeros(noMalla + 1)     #Campo electrico
 potencialM = np.zeros(noMalla + 1)   #Potencial Magnetico
 
 #Variables principales
@@ -40,7 +40,7 @@ malla_longitud = 2.0*np.pi #Tamano de la malla espacial
 plasma_inicio = 0
 plasma_final = malla_longitud
 dx = malla_longitud/noMalla
-dt = 0.1
+dt = 0.005
 carga_masa = -1 #relacion carga masa
 rho0 = 1 #Densidad del fondo de iones (default)
 velocidad_termica = 0.02
