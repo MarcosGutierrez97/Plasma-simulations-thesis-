@@ -189,7 +189,7 @@ def diagnosticos(t):
 
 #FUNCION PARA INESTABILIDAD TWO STREAM PLASMA
 def buildgrid_vel_2bp(x):
-    velocidad = []
+    velocidad = np.zeros(pa.noParticulas)
     for i in range(pa.noParticulas):
         #Construcción de la distribución Maxwelliana de la velocidad
         f_velmax = 0.5*(1 + sp.exp(-2*(pa.vh**2)))
@@ -198,23 +198,22 @@ def buildgrid_vel_2bp(x):
         v_temp = vmin + (vmax-vmin)*(sp.random.random())
         f_vel = 0.5 * (sp.exp(-(v_temp - pa.vh)*(v_temp - pa.vh) / 2.0) + sp.exp(-(v_temp + pa.vh)*(v_temp + pa.vh) / 2.0))
         x_temp = f_velmax*(sp.random.random())
-        va_temp = v_temp + pa.v0*np.cos(2*np.pi*x[i]/pa.malla_longitud)
         while x_temp >f_vel:
-            f_velmax = 0.5*(1 + sp.exp(-2*(pa.vh**2)))
-            vmin = -5 * pa.vh
+            f_velmax = 0.5*(1 + sp.exp(-2*pa.vh*pa.vh))
+            vmin = (-5) * pa.vh
             vmax = 5*pa.vh
             v_temp = vmin + (vmax-vmin)*(sp.random.random())
             f_vel = 0.5 * (sp.exp(-(v_temp - pa.vh)*(v_temp - pa.vh) / 2.0) + sp.exp(-(v_temp + pa.vh)*(v_temp + pa.vh) / 2.0))
             x_temp = f_velmax*(sp.random.random())
             va_temp = v_temp + pa.v0*np.cos(2*np.pi*x[i]/pa.malla_longitud)
-        velocidad.append(v_temp)
+        velocidad[i] = va_temp
     return velocidad
 #FUNCION PARA INESTABLIDAD BEAM PLASMA
-def buildgrid_vel_ibp ():
+def buildgrid_vel_ibp (x):
     velocidad = []
     v_m = pa.vh
-    n_l = pa.noParticulas * 0.8 #80% de las particulas estan a una velocidad menor
-    n_m = pa.noParticulas * 0.2 #20% de las particulas van a una velocidad mayor
+    n_l = pa.noParticulas * 0.9 #90% de las particulas estan a una velocidad menor
+    n_m = pa.noParticulas * 0.1 #10% de las particulas van a una velocidad mayor
     v_s = (v_m * n_m)/(n_l-n_m)
 
     for i in range (pa.noParticulas):
@@ -231,4 +230,5 @@ def buildgrid_vel_ibp ():
             v_temp = vmin + (vmax - vmin)*(np.random.random())
             f =  (1-(n_m/n_l))*np.exp(-(v_temp - v_s)*(v_temp - v_s)/1.0) + (n_m/n_l)*np.exp(-(v_temp - v_m)*(v_temp - v_m)/1.0)
             x_temp = f_velmax*(np.random.random())
-        velocidad.append(v_temp)
+        velocidad.append(v_temp+ pa.v0*np.cos(2*np.pi*x[i]/pa.malla_longitud) )
+    return velocidad

@@ -16,6 +16,7 @@ step = 0
 xgrid =pa.dx*np.arange(pa.noMalla + 1) #necesario para graficar
 posicion1 = f.buildgrid_pos(pa.x_inicial) #Solo se hace una vez
 velocidad1 = f.buildgrid_vel_2bp(posicion1) #Solo se hace una vez
+print(velocidad1)
 posicion1 = f.leapfrog(posicion1,velocidad1)
 posicion1 = f.cf(posicion1)
 densidad1 = f.chargedensity(posicion1)
@@ -24,7 +25,7 @@ K1 = f.Kenergy(velocidad1,0)
 U1 = f.Uenergy(E1,0)
 T1 = f.totalenergy(K1,U1)
 
-
+path = "C:/Users/HP/Documents/GitHub/Plasma-simulations-thesis-/Corrección 1/twostreamgraficas/"
 graf = (np.pi/pa.dt/16)
 t = 0
 p = 0
@@ -55,15 +56,13 @@ while  t < pa.time_step*pa.dt:
         K = K1
         U = U1
         T = T1
-        for k in range(pa.noParticulas):
-            if velocidad[k-1] > velocidad[k]:
-                vmas.append(velocidad[k])
-                xmas.append(posicion[k])
-            elif velocidad[k-1] < velocidad[k]:
-                vmenos.append(velocidad[k])
-                xmenos.append(posicion[k])
+        plt.scatter(posicion, velocidad)
+        plt.xlim(0,pa.malla_longitud)
+        plt.xlabel("x")
+        plt.ylabel("v")
+        plt.title("Inestabilidad Two-stream" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path + "2stream" + str(step) + ".png")
 
-        #f.diagnosticos(t)
     elif t > 0:
         posicion = f.chargeposition( velocidad,posicion)
         posicion = f.cf(posicion)
@@ -78,14 +77,13 @@ while  t < pa.time_step*pa.dt:
         camposE = np.append(camposE, E)
         energiacinetica = K
         energiapotencial = U
-        for k in range(pa.noParticulas):
-            if velocidad[k-1] > velocidad[k]:
-                vmas.append(velocidad[k])
-                xmas.append(posicion[k])
-            elif velocidad[k-1] < velocidad[k]:
-                vmenos.append(velocidad[k])
-                xmenos.append(posicion[k])
-
+        plt.clf()
+        plt.scatter(posicion, velocidad)
+        plt.xlim(0,pa.malla_longitud)
+        plt.xlabel("x")
+        plt.ylabel("v")
+        plt.title("Inestabilidad Two-stream" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path + "2stream" + str(step) + ".png")
 
         #f.diagnosticos(t)
 
@@ -139,8 +137,3 @@ for k in range (len(vmas)):
     plt.xlim(0,pa.malla_longitud)
     plt.show()
 """
-
-print (len(xmas))
-print (len(xmenos))
-print (len(vmas))
-print (len(xmenos))
