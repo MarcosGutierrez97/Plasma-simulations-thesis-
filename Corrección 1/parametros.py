@@ -12,7 +12,7 @@ noParticulas = 10000 #Numero de particulas
 noMalla = 1000 #puntos de la malla
 carga_e = -1 #electron
 carga_i = 1 #ion
-time_step = 150 #para beamplasma #150 para two stream
+time_step = 1500 #para beamplasma #150 para two stream
 vh = 6 #velocidad media del haz. Para pruebas 2-stream y Beam Stream
 
 #Arrays de las particulas
@@ -36,22 +36,25 @@ coor_malla = [float(i) for i in range(noMalla+1)]
 #print (len(coor_malla))
 x_inicial = np.zeros(noParticulas)
 v_inicial = np.zeros(noParticulas)
-malla_longitud = 32.0*np.pi #Tamano de la malla espacial
+malla_longitud = 32*np.pi #Tamano de la malla espacial #32pi para two stream y beam plasma
 plasma_inicio = 0
 plasma_final = malla_longitud
 dx = malla_longitud/noMalla
-dt = 0.1 #para plasma frio usar 0.005 y para 2 stream usar 0.1
+dt = 0.1
 carga_masa = -1 #relacion carga masa
 rho0 = 1 #Densidad del fondo de iones (default)
-velocidad_termica = 0.02
-x0 = 0.001 #perturbacion de amplitud
+x0 = 0.0 #perturbacion de amplitud
 v0 = 0.0 #perturbacion de velocidad
 densidadI = rho0
 
 
 #Parametros energeticos
 ki =[0.0 for i in range (time_step + 1)]
-kdrift =[0 for i in range (noParticulas)]
+kdrift =[0 for i in range (time_step + 1)]
 upot =[0.0 for i in range (time_step + 1)]
 totalenergy =[0.0 for i in range (time_step + 1)]
 camposaP = [0 for i in range (noParticulas)]
+x_i = plasma_final - plasma_inicio #Longitud de donde va a cargar la malla
+espacio_particulas = x_i / noParticulas
+carga = -rho0 * espacio_particulas
+m = carga/carga_e #MASA

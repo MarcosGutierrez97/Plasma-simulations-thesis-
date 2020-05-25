@@ -138,12 +138,8 @@ def chargedensity(x):
     return charge_density
 
 def Kenergy(v,step):
-    x_i = pa.plasma_final - pa.plasma_inicio #Longitud de donde va a cargar la malla
-    espacio_particulas = x_i / pa.noParticulas
-    carga = -pa.rho0 * espacio_particulas
-    m = carga/pa.carga_e
     v2 = [x**2 for x in v]
-    pa.ki[step] =  0.5*m*sum(v2)
+    pa.ki[step] =  0.5*pa.m*sum(v2)
     return pa.ki
 
 def Uenergy (Ex,step):
@@ -156,6 +152,11 @@ def totalenergy (k,u):
     for i in range(pa.time_step):
         pa.totalenergy[i] = k[i] + u[i]
     return pa.totalenergy
+def drift(v,step):
+    vdrift = sum(v)/pa.noParticulas
+    pa.kdrift[step] = 0.5*pa.m*(vdrift**(2))*pa.noParticulas
+    return pa.kdrift
+
 
 
 #Funciones para graficar

@@ -8,9 +8,13 @@ Created on Wed Apr 15 16:02:51 2020
 import funciones as f
 import parametros as pa
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
+"""
+PARAMETROS: 1000 PARTICULAS, 100 NODOS, 300 CICLOS, STEP TEMPORAL DE 0.001, PERTURBACION 0.001
+PARA VER BIEN LA GRAFICA DE LAS ENERGIAS AMPLIE A 1500 CICLOS, PERO SOLO PARA
+VER LA ENERGIA
+"""
 #Ciclo inicial. Este solo se hace una vez
 step = 0
 xgrid =pa.dx*np.arange(pa.noMalla + 1) #necesario para graficar
@@ -22,7 +26,9 @@ densidad1 = f.chargedensity(posicion1)
 E1 = f.electricfield(densidad1)
 K1 = f.Kenergy(velocidad1,0)
 U1 = f.Uenergy(E1,0)
+drift1 = f.drift(velocidad1,0)
 T1 = f.totalenergy(K1,U1)
+
 
 
 graf = (np.pi/pa.dt/16)
@@ -35,14 +41,19 @@ velocidades = [velocidad1]
 densidades = [densidad1]
 camposE = [E1]
 #camposE_particulas = [E_particulas_inicial]
-tiempo = []
+tiempo = [0]
 energiacinetica = []
 energiapotencial = []
 energiatotal = []
-
-
-
-
+DRIFT = []
+#densidad de carga
+path_p = "C:/Users/HP/Documents/GitHub/Plasma-simulations-thesis-/Corrección 1/plasmafrio_resultados/densidad/"
+#campo electrico
+path_e = "C:/Users/HP/Documents/GitHub/Plasma-simulations-thesis-/Corrección 1/plasmafrio_resultados/campo electrico/"
+#diagrama de fase
+path_f = "C:/Users/HP/Documents/GitHub/Plasma-simulations-thesis-/Corrección 1/plasmafrio_resultados/diagrama de fase/"
+#energias
+path_k = "C:/Users/HP/Documents/GitHub/Plasma-simulations-thesis-/Corrección 1/plasmafrio_resultados/energia/"
 while  t < pa.time_step*pa.dt:
     if t == 0:
         posicion = posicion1
@@ -51,9 +62,32 @@ while  t < pa.time_step*pa.dt:
         densidad = densidad1
         E = E1
         K = K1
+        drift = drift1
         U = U1
         T = T1
-        #f.diagnosticos(t)
+        """
+        plt.scatter(posicion, velocidad)
+        plt.xlim(0,pa.malla_longitud)
+        plt.xlabel("x")
+        plt.ylabel("v")
+        plt.title("Plasma frío:diagrama de fase" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_f + "plasmafrioDF" + str(step) + ".png")
+        plt.clf()
+        plt.scatter(xgrid, E)
+        plt.xlim(0,pa.malla_longitud)
+        plt.xlabel("x")
+        plt.ylabel("Ex")
+        plt.title("Plasma frío: campo eléctrico" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_e + "plasmafrioE" + str(step) + ".png")
+        plt.clf()
+        plt.scatter(xgrid, (densidad + 1))
+        plt.xlim(0,pa.malla_longitud)
+        plt.xlabel("x")
+        plt.ylabel("densidad de carga")
+        plt.title("Plasma frío: densidad de carga" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_p + "plasmafrioDC" + str(step) + ".png")
+        plt.clf()
+        """
     elif t > 0:
         posicion = f.chargeposition( velocidad,posicion)
         posicion = f.cf(posicion)
@@ -62,13 +96,37 @@ while  t < pa.time_step*pa.dt:
         E = f.electricfield(densidad)
         K = f.Kenergy(velocidad,step)
         U = f.Uenergy(E,step)
+
         posiciones = np.append(posiciones, posicion)
         velocidades = np.append(velocidades,velocidad)
         densidades = np.append(densidades, densidad)
         camposE = np.append(camposE, E)
         energiacinetica = K
         energiapotencial = U
-
+        DRIFT = drift
+        """
+        plt.scatter(posicion, velocidad)
+        plt.xlim(0,pa.malla_longitud)
+        plt.xlabel("x")
+        plt.ylabel("v")
+        plt.title("Plasma frío:diagrama de fase" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_f + "plasmafrioDF" + str(step) + ".png")
+        plt.clf()
+        plt.scatter(xgrid, E)
+        plt.xlim(0,pa.malla_longitud)
+        plt.xlabel("x")
+        plt.ylabel("Ex")
+        plt.title("Plasma frío: campo eléctrico" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_e + "plasmafrioE" + str(step) + ".png")
+        plt.clf()
+        plt.scatter(xgrid, (densidad + 1))
+        plt.xlim(0,pa.malla_longitud)
+        plt.xlabel("x")
+        plt.ylabel("densidad de carga")
+        plt.title("Plasma frío: densidad de carga" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_p + "plasmafrioDC" + str(step) + ".png")
+        plt.clf()
+        """
 
         #f.diagnosticos(t)
 
@@ -94,8 +152,13 @@ for i in range (len(densidades)):
 plt.show()
 """
 #energias
-plt.plot(tiempo,energiacinetica, 'r')
-plt.plot(tiempo, energiapotencial)
-plt.plot(tiempo, energiatotal)
+plt.plot(tiempo,energiacinetica, 'r', label = "K")
+plt.plot(tiempo, energiapotencial, label = "U")
+plt.plot(tiempo, energiatotal,  label = "T")
+plt.plot(tiempo, DRIFT, label = " Drift")
+plt.xlabel("Tiempo")
+plt.ylabel("Energía")
 plt.xlim(0,pa.malla_longitud)
+plt.legend()
+plt.savefig(path_k + "plasmafrioDC" + str(step) + ".png")
 plt.show()
