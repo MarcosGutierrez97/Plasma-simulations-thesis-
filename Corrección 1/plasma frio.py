@@ -31,7 +31,7 @@ T1 = f.totalenergy(K1,U1)
 
 
 
-graf = (np.pi/pa.dt/16)
+E_acumulado = np.empty((pa.noMalla + 1, pa.time_step + 1))
 t = 0
 step = 0
 p = 0
@@ -47,13 +47,16 @@ energiapotencial = []
 energiatotal = []
 DRIFT = []
 #densidad de carga
-path_p = "C:/Users/HP/Documents/GitHub/Plasma-simulations-thesis-/Corrección 1/plasmafrio_resultados/densidad/"
+#densidad de carga
+path_p = "C:/Users/HP/Documents/graficas tesis/plasmafrio_resultados/densidad/"
 #campo electrico
-path_e = "C:/Users/HP/Documents/GitHub/Plasma-simulations-thesis-/Corrección 1/plasmafrio_resultados/campo electrico/"
+path_e = "C:/Users/HP/Documents/graficas tesis/plasmafrio_resultados/campo electrico/"
 #diagrama de fase
-path_f = "C:/Users/HP/Documents/GitHub/Plasma-simulations-thesis-/Corrección 1/plasmafrio_resultados/diagrama de fase/"
+path_f = "C:/Users/HP/Documents/graficas tesis/plasmafrio_resultados/diagrama de fase/"
 #energias
-path_k = "C:/Users/HP/Documents/GitHub/Plasma-simulations-thesis-/Corrección 1/plasmafrio_resultados/energia/"
+path_k = "C:/Users/HP/Documents/graficas tesis/plasmafrio_resultados/energia/"
+
+plt.ticklabel_format(axis="y", style="sci", scilimits=(0,0))
 while  t < pa.time_step*pa.dt:
     if t == 0:
         posicion = posicion1
@@ -65,35 +68,49 @@ while  t < pa.time_step*pa.dt:
         drift = drift1
         U = U1
         T = T1
+        for q in range(1,pa.noMalla + 1):
+            E_acumulado[q:step] = E[q]
+        print (E)
+        print (E_acumulado)
         """
         plt.scatter(posicion, velocidad)
+        plt.ticklabel_format(axis="y", style="sci", scilimits=(0,0))
         plt.xlim(0,pa.malla_longitud)
+        plt.ylim(-pa.x0,pa.x0)
         plt.xlabel("x")
         plt.ylabel("v")
         plt.title("Plasma frío:diagrama de fase" + "  tiempo =" + str(round(t,2)))
         plt.savefig(path_f + "plasmafrioDF" + str(step) + ".png")
         plt.clf()
         plt.scatter(xgrid, E)
+        plt.ticklabel_format(axis="y", style="sci", scilimits=(0,0))
         plt.xlim(0,pa.malla_longitud)
-        plt.xlabel("x")
+        plt.ylim(-pa.x0,pa.x0)
+        plt.xlabel("posición malla")
         plt.ylabel("Ex")
         plt.title("Plasma frío: campo eléctrico" + "  tiempo =" + str(round(t,2)))
         plt.savefig(path_e + "plasmafrioE" + str(step) + ".png")
         plt.clf()
         plt.scatter(xgrid, (densidad + 1))
+        plt.ticklabel_format(axis="y", style="sci", scilimits=(0,0))
         plt.xlim(0,pa.malla_longitud)
-        plt.xlabel("x")
-        plt.ylabel("densidad de carga")
+        plt.ylim(-pa.x0,pa.x0)
+        plt.xlabel("posición malla")
+        plt.ylabel("densidad")
+        plt.ticklabel_format(axis="y", style="sci", scilimits=(0,0))
         plt.title("Plasma frío: densidad de carga" + "  tiempo =" + str(round(t,2)))
         plt.savefig(path_p + "plasmafrioDC" + str(step) + ".png")
         plt.clf()
         """
+
     elif t > 0:
         posicion = f.chargeposition( velocidad,posicion)
         posicion = f.cf(posicion)
         velocidad = f.chargevelocity(posicion,velocidad, E)
         densidad = f.chargedensity(posicion)
         E = f.electricfield(densidad)
+        for q in range(1,pa.noMalla + 1):
+            E_acumulado[q:step] = E[q]
         K = f.Kenergy(velocidad,step)
         U = f.Uenergy(E,step)
 
@@ -106,23 +123,28 @@ while  t < pa.time_step*pa.dt:
         DRIFT = drift
         """
         plt.scatter(posicion, velocidad)
+        plt.ticklabel_format(axis="y", style="sci", scilimits=(0,0))
         plt.xlim(0,pa.malla_longitud)
+        plt.ylim(-pa.x0,pa.x0)
         plt.xlabel("x")
         plt.ylabel("v")
         plt.title("Plasma frío:diagrama de fase" + "  tiempo =" + str(round(t,2)))
         plt.savefig(path_f + "plasmafrioDF" + str(step) + ".png")
         plt.clf()
         plt.scatter(xgrid, E)
+        plt.ticklabel_format(axis="y", style="sci", scilimits=(0,0))
         plt.xlim(0,pa.malla_longitud)
-        plt.xlabel("x")
+        plt.ylim(-pa.x0,pa.x0)
+        plt.xlabel("posición malla")
         plt.ylabel("Ex")
         plt.title("Plasma frío: campo eléctrico" + "  tiempo =" + str(round(t,2)))
         plt.savefig(path_e + "plasmafrioE" + str(step) + ".png")
         plt.clf()
         plt.scatter(xgrid, (densidad + 1))
+        plt.ticklabel_format(axis="y", style="sci", scilimits=(0,0))
         plt.xlim(0,pa.malla_longitud)
-        plt.xlabel("x")
-        plt.ylabel("densidad de carga")
+        plt.xlabel("posición malla")
+        plt.ylabel("densidad")
         plt.title("Plasma frío: densidad de carga" + "  tiempo =" + str(round(t,2)))
         plt.savefig(path_p + "plasmafrioDC" + str(step) + ".png")
         plt.clf()
@@ -138,20 +160,8 @@ while  t < pa.time_step*pa.dt:
 for  u in range (len(energiacinetica)):
     energiatotal.append(energiacinetica[u] + energiapotencial[u])
 
-#posiciones = [posiciones[i:i + pa.noParticulas] for i in range (0, len(posiciones),pa.noParticulas)]
-#velocidades = [velocidades[i:i + pa.noParticulas] for i in range (0, len(velocidades),pa.noParticulas)]
-#camposE = [camposE[i:i+pa.noMalla+1] for i in range(0,len(camposE),pa.noMalla+1)]
-#densidades = [densidades[i:i+pa.noMalla+1] for i in range(0,len(densidades),pa.noMalla+1)]
-#energiacinetica = [energiacinetica[i:i+pa.noParticulas] for i in range (0,len(energiacinetica),pa.noParticulas)]
-"""
-for i in range (len(densidades)):
-    plt.subplot(2,2,1)
-    plt.plot(xgrid, -(pa.densidadIg + densidades[i]), label = "densidades")
-    plt.scatter(xgrid, camposE[i], label ="campos")
-    plt.xlim(0,pa.malla_longitud)
-plt.show()
-"""
 #energias
+"""
 plt.plot(tiempo,energiacinetica, 'r', label = "K")
 plt.plot(tiempo, energiapotencial, label = "U")
 plt.plot(tiempo, energiatotal,  label = "T")
@@ -162,3 +172,5 @@ plt.xlim(0,pa.malla_longitud)
 plt.legend()
 plt.savefig(path_k + "plasmafrioDC" + str(step) + ".png")
 plt.show()
+"""
+f.dispersionfria(pa.k_teorica,pa.w_pp,path_k,E_acumulado)

@@ -25,13 +25,13 @@ U1 = f.Uenergy(E1,0)
 T1 = f.totalenergy(K1,U1)
 
 #densidad de carga
-path_p = "C:/Users/HP/Documents/GitHub/Plasma-simulations-thesis-/Corrección 1/landau_resultados/densidad 2/"
+path_p = "C:/Users/HP/Documents/graficas tesis/landau_resultados/densidad 2/"
 #campo electrico
-path_e = "C:/Users/HP/Documents/GitHub/Plasma-simulations-thesis-/Corrección 1/landau_resultados/campo electrico 2/"
+path_e = "C:/Users/HP/Documents/graficas tesis/landau_resultados/campo electrico 2/"
 #diagrama de fase
-path_f = "C:/Users/HP/Documents/GitHub/Plasma-simulations-thesis-/Corrección 1/landau_resultados/diagrama de fase 2/"
+path_f = "C:/Users/HP/Documents/graficas tesis/landau_resultados/diagrama de fase 2/"
 #energias
-path_k = "C:/Users/HP/Documents/GitHub/Plasma-simulations-thesis-/Corrección 1/landau_resultados/energia 2/"
+path_k = "C:/Users/HP/Documents/graficas tesis/landau_resultados/energia 2/"
 graf = (np.pi/pa.dt/16)
 t = 0
 p = 0
@@ -63,27 +63,27 @@ while  t < pa.time_step*pa.dt:
         U = U1
         T = T1
 
-            plt.scatter(posicion, velocidad)
-            plt.xlim(0,pa.malla_longitud)
-            plt.xlabel("x")
-            plt.ylabel("v")
-            plt.title("Amortiguamiento de Landau:diagrama de fase" + "  tiempo =" + str(round(t,2)))
-            plt.savefig(path_f + "landauDF" + str(step) + ".png")
-            plt.clf()
-            plt.scatter(xgrid, E)
-            plt.xlim(0,pa.malla_longitud)
-            plt.xlabel("x")
-            plt.ylabel("Ex")
-            plt.title("Amortiguamiento de Landau: campo eléctrico" + "  tiempo =" + str(round(t,2)))
-            plt.savefig(path_e + "landauE" + str(step) + ".png")
-            plt.clf()
-            plt.scatter(xgrid, (densidad + 1))
-            plt.xlim(0,pa.malla_longitud)
-            plt.xlabel("x")
-            plt.ylabel("densidad de carga")
-            plt.title("Amortiguamiento de Landau: densidad de carga" + "  tiempo =" + str(round(t,2)))
-            plt.savefig(path_p + "landauDC" + str(step) + ".png")
-            plt.clf()
+        plt.scatter(posicion, velocidad)
+        plt.xlim(0,pa.malla_longitud)
+        plt.xlabel("x")
+        plt.ylabel("v")
+        plt.title("Amortiguamiento de Landau:diagrama de fase" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_f + "landauDF" + str(step) + ".png")
+        plt.clf()
+        plt.scatter(xgrid, E)
+        plt.xlim(0,pa.malla_longitud)
+        plt.xlabel("x")
+        plt.ylabel("Ex")
+        plt.title("Amortiguamiento de Landau: campo eléctrico" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_e + "landauE" + str(step) + ".png")
+        plt.clf()
+        plt.scatter(xgrid, (densidad + 1))
+        plt.xlim(0,pa.malla_longitud)
+        plt.xlabel("x")
+        plt.ylabel("densidad de carga")
+        plt.title("Amortiguamiento de Landau: densidad de carga" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_p + "landauDC" + str(step) + ".png")
+        plt.clf()
 
     elif t > 0:
         posicion = f.chargeposition( velocidad,posicion)
@@ -99,27 +99,28 @@ while  t < pa.time_step*pa.dt:
         camposE = np.append(camposE, E)
         energiacinetica = K
         energiapotencial = U
-            plt.scatter(posicion, velocidad)
-            plt.xlim(0,pa.malla_longitud)
-            plt.xlabel("x")
-            plt.ylabel("v")
-            plt.title("Amortiguamiento de Landau:diagrama de fase" + "  tiempo =" + str(round(t,2)))
-            plt.savefig(path_f + "landauDF" + str(step) + ".png")
-            plt.clf()
-            plt.scatter(xgrid, E)
-            plt.xlim(0,pa.malla_longitud)
-            plt.xlabel("x")
-            plt.ylabel("Ex")
-            plt.title("Amortiguamiento de Landau: campo eléctrico" + "  tiempo =" + str(round(t,2)))
-            plt.savefig(path_e + "landauE" + str(step) + ".png")
-            plt.clf()
-            plt.scatter(xgrid, (densidad + 1))
-            plt.xlim(0,pa.malla_longitud)
-            plt.xlabel("x")
-            plt.ylabel("densidad de carga")
-            plt.title("Amortiguamiento de Landau: densidad de carga" + "  tiempo =" + str(round(t,2)))
-            plt.savefig(path_p + "landauDC" + str(step) + ".png")
-            plt.clf()
+        plt.scatter(posicion, velocidad)
+        plt.xlim(0,pa.malla_longitud)
+        plt.xlabel("x")
+        plt.ylabel("v")
+        plt.title("Amortiguamiento de Landau:diagrama de fase" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_f + "landauDF" + str(step) + ".png")
+        plt.clf()
+        plt.scatter(xgrid, E)
+        plt.xlim(0,pa.malla_longitud)
+        plt.xlabel("x")
+        plt.ylabel("Ex")
+        plt.title("Amortiguamiento de Landau: campo eléctrico" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_e + "landauE" + str(step) + ".png")
+        plt.clf()
+        plt.scatter(xgrid, (densidad + 1))
+        plt.xlim(0,pa.malla_longitud)
+        plt.xlabel("x")
+        plt.ylabel("densidad de carga")
+        plt.title("Amortiguamiento de Landau: densidad de carga" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_p + "landauDC" + str(step) + ".png")
+        plt.clf()
+
         #f.diagnosticos(t)
 
 

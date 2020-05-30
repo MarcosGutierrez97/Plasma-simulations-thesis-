@@ -29,16 +29,14 @@ E1 = f.electricfield(densidad1)
 K1 = f.Kenergy(velocidad1,0)
 U1 = f.Uenergy(E1,0)
 T1 = f.totalenergy(K1,U1)
-
 #densidad de carga
-path_p = "C:/Users/HP/Documents/GitHub/Plasma-simulations-thesis-/Corrección 1/landau_resultados/densidad/"
+path_p = "C:/Users/HP/Documents/graficas tesis/twostream_resultados/densidad 0.1/"
 #campo electrico
-path_e = "C:/Users/HP/Documents/GitHub/Plasma-simulations-thesis-/Corrección 1/landau_resultados/campo electrico/"
+path_e = "C:/Users/HP/Documents/graficas tesis/twostream_resultados/campo electrico 0.1/"
 #diagrama de fase
-path_f = "C:/Users/HP/Documents/GitHub/Plasma-simulations-thesis-/Corrección 1/landau_resultados/diagrama de fase/"
+path_f = "C:/Users/HP/Documents/graficas tesis/twostream_resultados/diagrama de fase 0.1/"
 #energias
-path_k = "C:/Users/HP/Documents/GitHub/Plasma-simulations-thesis-/Corrección 1/landau_resultados/energia/"
-
+path_k = "C:/Users/HP/Documents/graficas tesis/twostream_resultados/energia 0.1/"
 graf = (np.pi/pa.dt/16)
 t = 0
 p = 0
@@ -48,7 +46,7 @@ velocidades = [velocidad1]
 densidades = [densidad1]
 camposE = [E1]
 #camposE_particulas = [E_particulas_inicial]
-tiempo = []
+tiempo = [0]
 energiacinetica = []
 energiapotencial = []
 energiatotal = []
@@ -74,22 +72,24 @@ while  t < pa.time_step*pa.dt:
         plt.xlim(0,pa.malla_longitud)
         plt.xlabel("x")
         plt.ylabel("v")
-        plt.title("Amortiguamiento de Landau:diagrama de fase" + "  tiempo =" + str(round(t,2)))
-        plt.savefig(path_f + "landauDF" + str(step) + ".png")
+        plt.title("Inestabilidad Two-stream:diagrama de fase" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_f + "twostreamDF" + str(step) + ".png")
         plt.clf()
         plt.scatter(xgrid, E)
         plt.xlim(0,pa.malla_longitud)
+        plt.ylim(-8,8)
         plt.xlabel("x")
         plt.ylabel("Ex")
-        plt.title("Amortiguamiento de Landau: campo eléctrico" + "  tiempo =" + str(round(t,2)))
-        plt.savefig(path_e + "landauE" + str(step) + ".png")
+        plt.title("Inestabilidad Two-stream: campo eléctrico" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_e + "twostreamE" + str(step) + ".png")
         plt.clf()
         plt.scatter(xgrid, (densidad + 1))
         plt.xlim(0,pa.malla_longitud)
+        plt.ylim(-8,8)
         plt.xlabel("x")
         plt.ylabel("densidad de carga")
-        plt.title("Amortiguamiento de Landau: densidad de carga" + "  tiempo =" + str(round(t,2)))
-        plt.savefig(path_p + "landauDC" + str(step) + ".png")
+        plt.title("Inestabilidad Two-stream: densidad de carga" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_p + "twostreamDC" + str(step) + ".png")
         plt.clf()
 
 
@@ -112,22 +112,24 @@ while  t < pa.time_step*pa.dt:
         plt.xlim(0,pa.malla_longitud)
         plt.xlabel("x")
         plt.ylabel("v")
-        plt.title("Amortiguamiento de Landau:diagrama de fase" + "  tiempo =" + str(round(t,2)))
-        plt.savefig(path_f + "landauDF" + str(step) + ".png")
+        plt.title("Inestabilidad Two-stream:diagrama de fase" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_f + "twostreamDF" + str(step) + ".png")
         plt.clf()
         plt.scatter(xgrid, E)
         plt.xlim(0,pa.malla_longitud)
+        plt.ylim(-8,8)
         plt.xlabel("x")
         plt.ylabel("Ex")
-        plt.title("Amortiguamiento de Landau: campo eléctrico" + "  tiempo =" + str(round(t,2)))
-        plt.savefig(path_e + "landauE" + str(step) + ".png")
+        plt.title("Inestabilidad Two-stream: campo eléctrico" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_e + "twostreamE" + str(step) + ".png")
         plt.clf()
         plt.scatter(xgrid, (densidad + 1))
         plt.xlim(0,pa.malla_longitud)
+        plt.ylim(-8,8)
         plt.xlabel("x")
         plt.ylabel("densidad de carga")
-        plt.title("Amortiguamiento de Landau: densidad de carga" + "  tiempo =" + str(round(t,2)))
-        plt.savefig(path_p + "landauDC" + str(step) + ".png")
+        plt.title("Inestabilidad Two-stream: densidad de carga" + "  tiempo =" + str(round(t,2)))
+        plt.savefig(path_p + "twostreamDC" + str(step) + ".png")
         plt.clf()
 
         #f.diagnosticos(t)
@@ -165,11 +167,11 @@ plt.xlabel("Tiempo")
 plt.ylabel("Energía")
 plt.xlim(0,pa.malla_longitud)
 plt.legend()
-plt.savefig(path_k + "energiaslandauDC" + str(step) + ".png")
+plt.savefig(path_k + "energiastwostreamDC" + str(step) + ".png")
 plt.clf()
 plt.plot(tiempo, energiapotencial, label = "U")
 plt.xlabel("Tiempo")
 plt.ylabel("Energía")
 plt.xlim(0,pa.malla_longitud)
 plt.legend()
-plt.savefig(path_k + "potenciallandauDC" + str(step) + ".png")
+plt.savefig(path_k + "potencialTwostreamDC" + str(step) + ".png")

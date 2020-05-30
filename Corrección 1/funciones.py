@@ -11,6 +11,8 @@ import numpy as np
 import scipy as sp
 from scipy import integrate
 from scipy.stats import maxwell
+from scipy.fftpack import fft2
+from scipy.fftpack import fftshift as shift
 import matplotlib.pyplot as plt
 #################################
 # Funciones para el ciclo del PIC
@@ -22,6 +24,11 @@ puntos_malla = [i for i in range(pa.NoPpC)]
 
 """
 # Todo ESTO LO ESTOY HACIENDO SOLO PARA PLASMA FRIO, PERO LOS DEMAS CASOS SOLO SERIA DE AGREGAR DISTRIBUCIONES
+
+def nextpow2(x):
+    n = 1
+    while n < x: n *= 2
+    return n
 
 def buildgrid_pos(x_0):
     #posiciones:
@@ -54,7 +61,7 @@ def buildgrid_vel():
 
 def electricfield(rho0): #Le di por trapecio porque un chingo lo hacian asi. ✓ virgo
     rho_neto = 1.0 + rho0
-    """
+
     integrante = pa.dx * sp.arange(pa.noMalla + 1)
     Ex = integrate.cumtrapz(rho_neto, integrante, initial=integrante[0])
     E_i = sp.sum(Ex)
@@ -69,7 +76,9 @@ def electricfield(rho0): #Le di por trapecio porque un chingo lo hacian asi. ✓
     #Condiciones de frontera
     pa.campoEx[0:pa.noMalla] -= E_i / pa.noMalla
     pa.campoEx[pa.noMalla] = pa.campoEx[0]
-    return pa.campoEx
+    """
+    return Ex
+
 
 
 def chargevelocity(x,v, E_malla):
@@ -159,35 +168,6 @@ def drift(v,step):
 
 
 
-#Funciones para graficar
-"""
-def diagnosticos(t):
-    xgrid =pa.dx*np.arange(pa.noMalla + 1)
-    graf = (np.pi/pa.dt/16)
-    if t == 0:
-        plt.figure('Campos')
-        plt.clf()
-        if graf > 0:
-            if np.fmod(t,graf) == 0:
-                #densidad
-                plt.subplot(2,2,1)
-                if t > 0:
-                    plt.cla()
-                plt.plot(xgrid, -(pa.densidadI + chargedensity(x)),'r', label = 'densidad')
-                plt.xlabel('x')
-                plt.xlim(0,pa.malla_longitud)
-                #Campo electrico
-                plt.subplot(2,2,2)
-                if t > 0:
-                    plt.cla()
-                plt.plot(xgrid, electricfield(rho0), 'b', label = 'Campo electrico')
-                plt.xlabel('x')
-                plt.xlim(0,pa.malla_longitud)
-                plt.show()
-    return True
-"""
-
-
 #FUNCION PARA INESTABILIDAD TWO STREAM PLASMA
 def buildgrid_vel_2bp(x):
     velocidad = np.zeros(pa.noParticulas)
@@ -233,3 +213,25 @@ def buildgrid_vel_ibp (x):
             x_temp = f_velmax*(np.random.random())
         velocidad.append(v_temp+ pa.v0*np.cos(2*np.pi*x[i]/pa.malla_longitud) )
     return velocidad
+
+def dispersionfria(k,w,path_k,E_acumulado):
+
+    E_muestreado = E_acumulado[0:pa.noMalla:1,0:pa.time_step:5]
+    E_wk = fft2(E_muestreado,(nextpow2(pa.noMalla),nextpow2(pa.noMalla)))/pa.malla_longitud
+    E_wk_abs = abs(E_wk)
+    E_wk_shift = shift(E_wk_abs)
+    print(E_wk_shift)
+    plt.plot(k,w, 'k', label = '$\omega_{p}$')
+    plt.xlabel('k')
+    plt.ylabel('$\omega$')
+    #plt.xticks(np.linspace(0,2,8))
+    #plt.yticks(np.linspace(0,1,5))
+    plt.contourf(pa.K, pa.W,E_wk_shift, 9 ,alpha = 0.75, cmap = 'jet')
+    #plt.xlim(0,4)
+    plt.ylim(0,2)
+    plt.colorbar()
+    plt.legend()
+    plt.savefig(path_k + "dispersion"  + ".png")
+    plt.show()
+
+    return True
