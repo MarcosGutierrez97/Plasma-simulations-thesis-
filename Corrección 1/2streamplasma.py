@@ -29,14 +29,16 @@ E1 = f.electricfield(densidad1)
 K1 = f.Kenergy(velocidad1,0)
 U1 = f.Uenergy(E1,0)
 T1 = f.totalenergy(K1,U1)
+
 #densidad de carga
-path_p = "C:/Users/HP/Documents/graficas tesis/twostream_resultados/densidad 0.1/"
+path_p = "C:/Users/HP/Documents/graficas tesis/landau_resultados/densidad ts/"
 #campo electrico
-path_e = "C:/Users/HP/Documents/graficas tesis/twostream_resultados/campo electrico 0.1/"
+path_e = "C:/Users/HP/Documents/graficas tesis/landau_resultados/campo electrico ts/"
 #diagrama de fase
-path_f = "C:/Users/HP/Documents/graficas tesis/twostream_resultados/diagrama de fase 0.1/"
+path_f = "C:/Users/HP/Documents/graficas tesis/landau_resultados/diagrama de fase ts/"
 #energias
-path_k = "C:/Users/HP/Documents/graficas tesis/twostream_resultados/energia 0.1/"
+path_k = "C:/Users/HP/Documents/graficas tesis/landau_resultados/energia ts/"
+
 graf = (np.pi/pa.dt/16)
 t = 0
 p = 0
@@ -46,7 +48,7 @@ velocidades = [velocidad1]
 densidades = [densidad1]
 camposE = [E1]
 #camposE_particulas = [E_particulas_inicial]
-tiempo = [0]
+tiempo = []
 energiacinetica = []
 energiapotencial = []
 energiatotal = []
@@ -67,7 +69,7 @@ while  t < pa.time_step*pa.dt:
         K = K1
         U = U1
         T = T1
-
+        """
         plt.scatter(posicion, velocidad)
         plt.xlim(0,pa.malla_longitud)
         plt.xlabel("x")
@@ -91,7 +93,7 @@ while  t < pa.time_step*pa.dt:
         plt.title("Inestabilidad Two-stream: densidad de carga" + "  tiempo =" + str(round(t,2)))
         plt.savefig(path_p + "twostreamDC" + str(step) + ".png")
         plt.clf()
-
+        """
 
     elif t > 0:
         posicion = f.chargeposition( velocidad,posicion)
@@ -107,7 +109,7 @@ while  t < pa.time_step*pa.dt:
         camposE = np.append(camposE, E)
         energiacinetica = K
         energiapotencial = U
-
+        """
         plt.scatter(posicion, velocidad)
         plt.xlim(0,pa.malla_longitud)
         plt.xlabel("x")
@@ -131,7 +133,7 @@ while  t < pa.time_step*pa.dt:
         plt.title("Inestabilidad Two-stream: densidad de carga" + "  tiempo =" + str(round(t,2)))
         plt.savefig(path_p + "twostreamDC" + str(step) + ".png")
         plt.clf()
-
+        """
         #f.diagnosticos(t)
 
 
@@ -172,6 +174,9 @@ plt.clf()
 plt.plot(tiempo, energiapotencial, label = "U")
 plt.xlabel("Tiempo")
 plt.ylabel("Energía")
-plt.xlim(0,pa.malla_longitud)
+#plt.xlim(0,pa.malla_longitud)
 plt.legend()
 plt.savefig(path_k + "potencialTwostreamDC" + str(step) + ".png")
+
+print ("energia K media")
+print (sum(energiacinetica)/len(energiacinetica))
