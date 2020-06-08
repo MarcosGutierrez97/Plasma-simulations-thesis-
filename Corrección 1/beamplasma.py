@@ -15,7 +15,6 @@ step = 0
 xgrid =pa.dx*np.arange(pa.noMalla + 1) #necesario para graficar
 posicion1 = f.buildgrid_pos(pa.x_inicial) #Solo se hace una vez
 velocidad1 = f.buildgrid_vel_ibp(posicion1) #Solo se hace una vez
-print(velocidad1)
 posicion1 = f.leapfrog(posicion1,velocidad1)
 posicion1 = f.cf(posicion1)
 densidad1 = f.chargedensity(posicion1)
@@ -40,7 +39,6 @@ posiciones= [posicion1]
 velocidades = [velocidad1]
 densidades = [densidad1]
 camposE = [E1]
-#camposE_particulas = [E_particulas_inicial]
 tiempo = []
 energiacinetica = []
 energiapotencial = []
@@ -126,33 +124,14 @@ while  t < pa.time_step*pa.dt:
         plt.savefig(path_p + "landauDC" + str(step) + ".png")
         plt.clf()
         """
-        #f.diagnosticos(t)
 
-
-    #f.diagnosticos(densidad, E,t,graf)
     t = t + pa.dt
     step = step + 1
     tiempo.append(t)
 for  u in range (len(energiacinetica)):
     energiatotal.append(energiacinetica[u] + energiapotencial[u])
 
-#posiciones = [posiciones[i:i + pa.noParticulas] for i in range (0, len(posiciones),pa.noParticulas)]
-#velocidades = [velocidades[i:i + pa.noParticulas] for i in range (0, len(velocidades),pa.noParticulas)]
-#vmas = [vmas[i:i + pa.noParticulas] for i in range (0, len(vmas),pa.noParticulas)]
-#xmas = [xmas[i:i + pa.noParticulas] for i in range (0, len(xmas),pa.noParticulas)]
-#vmenos = [vmenos[i:i + pa.noParticulas] for i in range (0, len(vmenos),pa.noParticulas)]
-#xmenos = [xmenos[i:i + pa.noParticulas] for i in range (0, len(xmenos),pa.noParticulas)]
-#camposE = [camposE[i:i+pa.noMalla+1] for i in range(0,len(camposE),pa.noMalla+1)]
-#densidades = [densidades[i:i+pa.noMalla+1] for i in range(0,len(densidades),pa.noMalla+1)]
-#energiacinetica = [energiacinetica[i:i+pa.noParticulas] for i in range (0,len(energiacinetica),pa.noParticulas)]
-"""
-for i in range (len(densidades)):
-    plt.subplot(2,2,1)
-    plt.plot(xgrid, -(pa.densidadIg + densidades[i]), label = "densidades")
-    plt.scatter(xgrid, camposE[i], label ="campos")
-    plt.xlim(0,pa.malla_longitud)
-plt.show()
-"""
+
 plt.plot(tiempo,energiacinetica, 'r', label = "K")
 plt.plot(tiempo, energiapotencial, label = "U")
 plt.plot(tiempo, energiatotal,  label = "T")

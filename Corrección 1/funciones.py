@@ -70,8 +70,8 @@ def buildgrid_vel_2bp(x):
 def buildgrid_vel_ibp (x):
     velocidad = []
     v_m = pa.vh
-    n_l = pa.noParticulas * 0.9 #90% de las particulas estan a una velocidad menor
-    n_m = pa.noParticulas * 0.1 #10% de las particulas van a una velocidad mayor
+    n_l = pa.noParticulas * 0.9 #90% de las particulas
+    n_m = pa.noParticulas * 0.1 #10% de las particulas 
     v_s = (v_m * n_m)/(n_l-n_m)
 
     for i in range (pa.noParticulas):
@@ -103,11 +103,7 @@ def electricfield(rho0):
 
 #FUNCION QUE ACUTUALIZA VELOCIDADES
 def chargevelocity(x,v, E_malla):
-    '''
-    Implementando Ecuacion 8 de Martin.pdf
 
-    '''
-    #Extrapolación del campo eléctrico (no lo había puesto)
     for k in range (pa.noParticulas):
         xa = x[k]/pa.dx
         j1 = int(xa)
@@ -121,9 +117,6 @@ def chargevelocity(x,v, E_malla):
 
 #FUNCION QUE ACUTALIZA POSICIONES
 def chargeposition(v_med, x):
-    '''
-    Implementando Ecuacion 9 de Martin.pdf
-    '''
 #Condición necesaria para el método de integración Leap-Frog
     for i in range(pa.noParticulas):
         x[i] = x[i] +  v_med[i] * pa.dt
@@ -143,10 +136,6 @@ def cf(x_cf):
 
 #FUNCION QUE CALCULA LA DENSIDAD DE CARGA
 def chargedensity(x):
-    '''
-    Implementando Ecuaciones 20 y 21 de Martin.pdf
-    Solo si X[0] = 0 (revisa que esto suceda) YA SUCEDE
-    '''
     j1=np.dtype(np.int32)
     j2=np.dtype(np.int32)
     charge_density = np.zeros(pa.noMalla + 1)

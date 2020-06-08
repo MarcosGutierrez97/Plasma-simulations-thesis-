@@ -2,13 +2,12 @@
 """
 Created on Wed Apr 15 16:02:51 2020
 
-@author: HP
+@author: Marcos Gutierrez
 """
 
 import funciones as f
 import parametros as pa
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
 """
@@ -47,7 +46,6 @@ posiciones= [posicion1]
 velocidades = [velocidad1]
 densidades = [densidad1]
 camposE = [E1]
-#camposE_particulas = [E_particulas_inicial]
 tiempo = []
 energiacinetica = []
 energiapotencial = []
@@ -134,33 +132,13 @@ while  t < pa.time_step*pa.dt:
         plt.savefig(path_p + "twostreamDC" + str(step) + ".png")
         plt.clf()
         """
-        #f.diagnosticos(t)
 
-
-    #f.diagnosticos(densidad, E,t,graf)
     t = t + pa.dt
     step = step + 1
     tiempo.append(t)
 for  u in range (len(energiacinetica)):
     energiatotal.append(energiacinetica[u] + energiapotencial[u])
 
-#posiciones = [posiciones[i:i + pa.noParticulas] for i in range (0, len(posiciones),pa.noParticulas)]
-#velocidades = [velocidades[i:i + pa.noParticulas] for i in range (0, len(velocidades),pa.noParticulas)]
-#vmas = [vmas[i:i + pa.noParticulas] for i in range (0, len(vmas),pa.noParticulas)]
-#xmas = [xmas[i:i + pa.noParticulas] for i in range (0, len(xmas),pa.noParticulas)]
-#vmenos = [vmenos[i:i + pa.noParticulas] for i in range (0, len(vmenos),pa.noParticulas)]
-#xmenos = [xmenos[i:i + pa.noParticulas] for i in range (0, len(xmenos),pa.noParticulas)]
-#camposE = [camposE[i:i+pa.noMalla+1] for i in range(0,len(camposE),pa.noMalla+1)]
-#densidades = [densidades[i:i+pa.noMalla+1] for i in range(0,len(densidades),pa.noMalla+1)]
-#energiacinetica = [energiacinetica[i:i+pa.noParticulas] for i in range (0,len(energiacinetica),pa.noParticulas)]
-"""
-for i in range (len(densidades)):
-    plt.subplot(2,2,1)
-    plt.plot(xgrid, -(pa.densidadIg + densidades[i]), label = "densidades")
-    plt.scatter(xgrid, camposE[i], label ="campos")
-    plt.xlim(0,pa.malla_longitud)
-plt.show()
-"""
 #energias
 plt.plot(tiempo,energiacinetica, 'r', label = "K")
 plt.plot(tiempo, energiapotencial, label = "U")

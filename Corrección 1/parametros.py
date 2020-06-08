@@ -23,7 +23,7 @@ vh = 6 #velocidad media del haz. Para pruebas 2-stream y Beam Stream
 coor_malla = [float(i) for i in range(noMalla+1)]
 campoEx = np.zeros(noMalla + 1)
 x_inicial = np.zeros(noParticulas)
-malla_longitud = 32*np.pi #Tamano de la malla espacial #32pi para two stream y beam plasma
+malla_longitud = 32*np.pi #Tamaño de la malla espacial
 plasma_inicio = 0
 plasma_final = malla_longitud
 
@@ -33,7 +33,7 @@ dt = 0.1
 
 #Parametros de las particulas
 carga_masa = -1 #relacion carga masa
-rho0 = 1 #Densidad del fondo de iones (default)
+rho0 = 1 #Densidad del fondo de iones 
 x0 = 0.0 #perturbacion de amplitud
 v0 = 0.0 #perturbacion de velocidad
 densidadI = rho0 #densidad ionica
